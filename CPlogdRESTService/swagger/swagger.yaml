@@ -1,0 +1,203 @@
+swagger: '2.0'
+info:
+  title: Conformal Prediction Log D 
+  description: >-
+    This is a Conformal Prediction Service for predicting Log D values. The 
+    model has been trained and evaluated on ChEMBL 23 data. Modeling is done using
+    CPSign (product of GenettaSoft AB).
+  version: 0.0.1
+  contact:
+    name: CPSign Support
+    url: 'http://cpsign-docs.genettasoft.com'
+    email: info@genettasoft.com
+basePath: /v1
+schemes:
+  - http
+produces:
+  - application/json
+paths:
+
+  /logd:
+    get:
+      tags: 
+        - Predict
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/smiles"
+        - name: confidence
+          in: query
+          description: The desired confidence of the prediction
+          required: false
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          default: 0.8
+      responses:
+        '200':
+          description: prediction result
+          schema:
+            $ref: "#/definitions/Prediction"
+        '400':
+          description: SMILES not possible to parse
+          schema:
+            $ref: "#/definitions/Error"
+        '500':
+          description: Server error
+          schema:
+            $ref: "#/definitions/Error"
+          
+  /tasks:
+    get:
+      tags:
+        - Task
+      description: Get a list of all available tasks URIs
+      responses:
+        '200':
+          description: list of running tasks
+          schema:
+            type: array
+            items:
+              type: string
+              description: URI of running tasks
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/tasks/{id}':
+    get:
+      tags:
+        - Task
+      description: Get status of the task
+      parameters:
+        - name: id
+          in: path
+          description: The Task URI to query
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Task has successfully finished
+          schema:
+            type: string
+            description: URI of the result from this Task
+        '202':
+          description: Task is running
+          schema:
+            $ref: "#/definitions/TaskInfo"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Task for id not found
+          schema:
+            $ref: '#/definitions/Error'
+        '502':
+          description: Task has failed
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Task
+      description: Delete (cancel) a task
+      parameters:
+        - name: id
+          in: path
+          description: The Task URI to query
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Task successfully cancelled
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Task for id not found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+definitions:
+  Error:
+    type: object
+    description: Error
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: HTTP status code
+        minimum: 100
+        maximum: 600
+      message:
+        type: string
+        description: Error message
+  smiles:
+    type: string
+    description: Compound structure notated using SMILES notation
+    x-ontology: http://edamontology.org/format_1196
+  Prediction:
+    type: object
+    description: Prediction result
+    properties:
+      smiles:
+        $ref: "#/definitions/smiles"
+      rangeLow:
+        type: number
+        format: double
+        description: The lower range of the prediction value
+      rangeHigh:
+        type: number
+        format: double
+        description: The higher range of the prediction value
+      predictionMidpoint:
+        type: number
+        format: double
+        description: >-
+          The predicted midpoint value, note that this is the 
+          prediction given by the underlying SVM-models and 
+          there is NO confidence assigned to this point value!
+  TaskInfo:
+    type: object
+    description: Information about a running Task
+    properties:
+      progress:
+        type: number
+        minimum: 0
+        maximum: 100
+        description: Progress [0-100%]
+      currentRuntime:
+        type: number
+        description: How long the task has been running (milliseconds)
+
+
+parameters:
+  smiles:
+    name: smiles
+    in: query
+    required: true
+    description: Compound structure notation using SMILES notation
+    type: string
+    x-ontology: http://edamontology.org/format_1196
