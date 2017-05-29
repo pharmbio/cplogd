@@ -26,138 +26,138 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Prediction result")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-05-29T12:46:15.437Z")
 public class Prediction   {
-  @JsonProperty("smiles")
-  private String smiles = null;
+	@JsonProperty("smiles")
+	private String smiles = null;
 
-  @JsonProperty("lower")
-  private Double lower = null;
+	@JsonProperty("lower")
+	private Double lower = null;
 
-  @JsonProperty("upper")
-  private Double upper = null;
+	@JsonProperty("upper")
+	private Double upper = null;
 
-  @JsonProperty("predictionMidpoint")
-  private Double predictionMidpoint = null;
+	@JsonProperty("predictionMidpoint")
+	private Double predictionMidpoint = null;
 
-  public Prediction smiles(String smiles) {
-    this.smiles = smiles;
-    return this;
-  }
+	public Prediction smiles(String smiles) {
+		this.smiles = smiles;
+		return this;
+	}
 
-   /**
-   * Compound structure notated using SMILES notation
-   * @return smiles
-  **/
-  @JsonProperty("smiles")
-  @ApiModelProperty(value = "Compound structure notated using SMILES notation")
-  public String getSmiles() {
-    return smiles;
-  }
+	/**
+	 * Compound structure notated using SMILES notation
+	 * @return smiles
+	 **/
+	@JsonProperty("smiles")
+	@ApiModelProperty(value = "Compound structure notated using SMILES notation")
+	public String getSmiles() {
+		return smiles;
+	}
 
-  public void setSmiles(String smiles) {
-    this.smiles = smiles;
-  }
+	public void setSmiles(String smiles) {
+		this.smiles = smiles;
+	}
 
-  public Prediction lower(Double lower) {
-    this.lower = lower;
-    return this;
-  }
+	public Prediction lower(Double lower) {
+		this.lower = lower;
+		return this;
+	}
 
-   /**
-   * The lower range of the prediction value
-   * @return lower
-  **/
-  @JsonProperty("lower")
-  @ApiModelProperty(value = "The lower range of the prediction value")
-  public Double getLower() {
-    return lower;
-  }
+	/**
+	 * The lower range of the prediction value
+	 * @return lower
+	 **/
+	@JsonProperty("lower")
+	@ApiModelProperty(value = "The lower range of the prediction value")
+	public Double getLower() {
+		return lower;
+	}
 
-  public void setLower(Double lower) {
-    this.lower = lower;
-  }
+	public void setLower(Double lower) {
+		this.lower = lower;
+	}
 
-  public Prediction upper(Double upper) {
-    this.upper = upper;
-    return this;
-  }
+	public Prediction upper(Double upper) {
+		this.upper = upper;
+		return this;
+	}
 
-   /**
-   * The upper range of the prediction value
-   * @return upper
-  **/
-  @JsonProperty("upper")
-  @ApiModelProperty(value = "The upper range of the prediction value")
-  public Double getUpper() {
-    return upper;
-  }
+	/**
+	 * The upper range of the prediction value
+	 * @return upper
+	 **/
+	@JsonProperty("upper")
+	@ApiModelProperty(value = "The upper range of the prediction value")
+	public Double getUpper() {
+		return upper;
+	}
 
-  public void setUpper(Double upper) {
-    this.upper = upper;
-  }
+	public void setUpper(Double upper) {
+		this.upper = upper;
+	}
 
-  public Prediction predictionMidpoint(Double predictionMidpoint) {
-    this.predictionMidpoint = predictionMidpoint;
-    return this;
-  }
+	public Prediction predictionMidpoint(Double predictionMidpoint) {
+		this.predictionMidpoint = predictionMidpoint;
+		return this;
+	}
 
-   /**
-   * The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!
-   * @return predictionMidpoint
-  **/
-  @JsonProperty("predictionMidpoint")
-  @ApiModelProperty(value = "The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!")
-  public Double getPredictionMidpoint() {
-    return predictionMidpoint;
-  }
+	/**
+	 * The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!
+	 * @return predictionMidpoint
+	 **/
+	@JsonProperty("predictionMidpoint")
+	@ApiModelProperty(value = "The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!")
+	public Double getPredictionMidpoint() {
+		return predictionMidpoint;
+	}
 
-  public void setPredictionMidpoint(Double predictionMidpoint) {
-    this.predictionMidpoint = predictionMidpoint;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Prediction prediction = (Prediction) o;
-    return Objects.equals(this.smiles, prediction.smiles) &&
-        Objects.equals(this.lower, prediction.lower) &&
-        Objects.equals(this.upper, prediction.upper) &&
-        Objects.equals(this.predictionMidpoint, prediction.predictionMidpoint);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(smiles, lower, upper, predictionMidpoint);
-  }
+	public void setPredictionMidpoint(Double predictionMidpoint) {
+		this.predictionMidpoint = predictionMidpoint;
+	}
 
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{\n");
-    
-    sb.append("    smiles: ").append(toIndentedString(smiles)).append(",\n");
-    sb.append("    lower: ").append(toIndentedString(lower)).append(",\n");
-    sb.append("    upper: ").append(toIndentedString(upper)).append(",\n");
-    sb.append("    predictionMidpoint: ").append(toIndentedString(predictionMidpoint)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
+	@Override
+	public boolean equals(java.lang.Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Prediction prediction = (Prediction) o;
+		return Objects.equals(this.smiles, prediction.smiles) &&
+				Objects.equals(this.lower, prediction.lower) &&
+				Objects.equals(this.upper, prediction.upper) &&
+				Objects.equals(this.predictionMidpoint, prediction.predictionMidpoint);
+	}
 
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hash(smiles, lower, upper, predictionMidpoint);
+	}
+
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{\n");
+
+		sb.append("    smiles: ").append(toIndentedString(smiles)).append(",\n");
+		sb.append("    lower: ").append(toIndentedString(lower)).append(",\n");
+		sb.append("    upper: ").append(toIndentedString(upper)).append(",\n");
+		sb.append("    predictionMidpoint: ").append(toIndentedString(predictionMidpoint)).append("\n");
+		sb.append("}");
+		return sb.toString();
+	}
+
+	/**
+	 * Convert the given object to string with each line indented by 4 spaces
+	 * (except the first line).
+	 */
+	private String toIndentedString(java.lang.Object o) {
+		if (o == null) {
+			return "null";
+		}
+		return o.toString().replace("\n", "\n    ");
+	}
 }
 

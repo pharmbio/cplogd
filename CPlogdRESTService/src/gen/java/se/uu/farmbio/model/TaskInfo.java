@@ -30,118 +30,118 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Information about a running Task")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-05-29T12:46:15.437Z")
 public class TaskInfo   {
-  @JsonProperty("uri")
-  private String uri = null;
+	@JsonProperty("uri")
+	private String uri = null;
 
-  @JsonProperty("progress")
-  private BigDecimal progress = null;
+	@JsonProperty("progress")
+	private BigDecimal progress = null;
 
-  @JsonProperty("currentRuntime")
-  private BigDecimal currentRuntime = null;
+	@JsonProperty("currentRuntime")
+	private BigDecimal currentRuntime = null;
 
-  public TaskInfo uri(String uri) {
-    this.uri = uri;
-    return this;
-  }
+	public TaskInfo uri(String uri) {
+		this.uri = uri;
+		return this;
+	}
 
-   /**
-   * The URI of the Task
-   * @return uri
-  **/
-  @JsonProperty("uri")
-  @ApiModelProperty(value = "The URI of the Task")
-  public String getUri() {
-    return uri;
-  }
+	/**
+	 * The URI of the Task
+	 * @return uri
+	 **/
+	@JsonProperty("uri")
+	@ApiModelProperty(value = "The URI of the Task")
+	public String getUri() {
+		return uri;
+	}
 
-  public void setUri(String uri) {
-    this.uri = uri;
-  }
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
 
-  public TaskInfo progress(BigDecimal progress) {
-    this.progress = progress;
-    return this;
-  }
+	public TaskInfo progress(BigDecimal progress) {
+		this.progress = progress;
+		return this;
+	}
 
-   /**
-   * Progress [0-100%]
-   * minimum: 0
-   * maximum: 100
-   * @return progress
-  **/
-  @JsonProperty("progress")
-  @ApiModelProperty(value = "Progress [0-100%]")
-  @DecimalMin("0")
-  @DecimalMax("100")
-  public BigDecimal getProgress() {
-    return progress;
-  }
+	/**
+	 * Progress [0-100%]
+	 * minimum: 0
+	 * maximum: 100
+	 * @return progress
+	 **/
+	@JsonProperty("progress")
+	@ApiModelProperty(value = "Progress [0-100%]")
+	@DecimalMin("0")
+	@DecimalMax("100")
+	public BigDecimal getProgress() {
+		return progress;
+	}
 
-  public void setProgress(BigDecimal progress) {
-    this.progress = progress;
-  }
+	public void setProgress(BigDecimal progress) {
+		this.progress = progress;
+	}
 
-  public TaskInfo currentRuntime(BigDecimal currentRuntime) {
-    this.currentRuntime = currentRuntime;
-    return this;
-  }
+	public TaskInfo currentRuntime(BigDecimal currentRuntime) {
+		this.currentRuntime = currentRuntime;
+		return this;
+	}
 
-   /**
-   * How long the task has been running (milliseconds)
-   * @return currentRuntime
-  **/
-  @JsonProperty("currentRuntime")
-  @ApiModelProperty(value = "How long the task has been running (milliseconds)")
-  public BigDecimal getCurrentRuntime() {
-    return currentRuntime;
-  }
+	/**
+	 * How long the task has been running (milliseconds)
+	 * @return currentRuntime
+	 **/
+	@JsonProperty("currentRuntime")
+	@ApiModelProperty(value = "How long the task has been running (milliseconds)")
+	public BigDecimal getCurrentRuntime() {
+		return currentRuntime;
+	}
 
-  public void setCurrentRuntime(BigDecimal currentRuntime) {
-    this.currentRuntime = currentRuntime;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    TaskInfo taskInfo = (TaskInfo) o;
-    return Objects.equals(this.uri, taskInfo.uri) &&
-        Objects.equals(this.progress, taskInfo.progress) &&
-        Objects.equals(this.currentRuntime, taskInfo.currentRuntime);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(uri, progress, currentRuntime);
-  }
+	public void setCurrentRuntime(BigDecimal currentRuntime) {
+		this.currentRuntime = currentRuntime;
+	}
 
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{\n");
-    
-    sb.append("    uri: ").append(toIndentedString(uri)).append(",\n");
-    sb.append("    progress: ").append(toIndentedString(progress)).append(",\n");
-    sb.append("    currentRuntime: ").append(toIndentedString(currentRuntime)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
+	@Override
+	public boolean equals(java.lang.Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		TaskInfo taskInfo = (TaskInfo) o;
+		return Objects.equals(this.uri, taskInfo.uri) &&
+				Objects.equals(this.progress, taskInfo.progress) &&
+				Objects.equals(this.currentRuntime, taskInfo.currentRuntime);
+	}
 
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hash(uri, progress, currentRuntime);
+	}
+
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{\n");
+
+		sb.append("    uri: ").append(toIndentedString(uri)).append(",\n");
+		sb.append("    progress: ").append(toIndentedString(progress)).append(",\n");
+		sb.append("    currentRuntime: ").append(toIndentedString(currentRuntime)).append("\n");
+		sb.append("}");
+		return sb.toString();
+	}
+
+	/**
+	 * Convert the given object to string with each line indented by 4 spaces
+	 * (except the first line).
+	 */
+	private String toIndentedString(java.lang.Object o) {
+		if (o == null) {
+			return "null";
+		}
+		return o.toString().replace("\n", "\n    ");
+	}
 }
 
