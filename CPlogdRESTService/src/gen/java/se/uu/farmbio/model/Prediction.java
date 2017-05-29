@@ -14,11 +14,11 @@
 package se.uu.farmbio.model;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
 
 /**
  * Prediction result
@@ -139,11 +139,11 @@ public class Prediction   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Prediction {\n");
+    sb.append("{\n");
     
-    sb.append("    smiles: ").append(toIndentedString(smiles)).append("\n");
-    sb.append("    lower: ").append(toIndentedString(lower)).append("\n");
-    sb.append("    upper: ").append(toIndentedString(upper)).append("\n");
+    sb.append("    smiles: ").append(toIndentedString(smiles)).append(",\n");
+    sb.append("    lower: ").append(toIndentedString(lower)).append(",\n");
+    sb.append("    upper: ").append(toIndentedString(upper)).append(",\n");
     sb.append("    predictionMidpoint: ").append(toIndentedString(predictionMidpoint)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -13,13 +13,16 @@
 
 package se.uu.farmbio.model;
 
+import java.math.BigDecimal;
 import java.util.Objects;
+
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.math.BigDecimal;
-import javax.validation.constraints.*;
 
 /**
  * Information about a running Task
@@ -121,10 +124,10 @@ public class TaskInfo   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TaskInfo {\n");
+    sb.append("{\n");
     
-    sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
-    sb.append("    progress: ").append(toIndentedString(progress)).append("\n");
+    sb.append("    uri: ").append(toIndentedString(uri)).append(",\n");
+    sb.append("    progress: ").append(toIndentedString(progress)).append(",\n");
     sb.append("    currentRuntime: ").append(toIndentedString(currentRuntime)).append("\n");
     sb.append("}");
     return sb.toString();
