@@ -69,6 +69,7 @@ paths:
           description: A dataset to be predicted
           required: false
           type: string
+          format: uri
         - name: dataFile
           in: formData
           type: file
@@ -84,10 +85,8 @@ paths:
           maximum: 1.0
           default: 0.8
       responses:
-        '202':
-          description: Prediction accepted by server
-          schema:
-            $ref: "#/definitions/Prediction"
+        '302':
+          description: Prediction accepted by server - redirect to prediction task to query
         '400':
           description: Bad request (missing dataset)
           schema:
@@ -130,10 +129,11 @@ paths:
           type: string
           required: true
       responses:
-        '200':
-          description: Task has successfully finished
+        '301':
+          description: Prediction has successfully finished
           schema:
             type: string
+            format: uri
             description: URI of the result from this Task
         '202':
           description: Task is running
@@ -166,7 +166,7 @@ definitions:
       message:
         type: string
         description: Error message
-  SMILES:
+  smiles:
     type: string
     description: Compound structure notated using SMILES notation
     x-ontology: http://edamontology.org/format_1196
@@ -175,15 +175,15 @@ definitions:
     description: Prediction result
     properties:
       smiles:
-        $ref: "#/definitions/SMILES"
-      rangeLow:
+        $ref: "#/definitions/smiles"
+      lower:
         type: number
         format: double
         description: The lower range of the prediction value
-      rangeHigh:
+      upper:
         type: number
         format: double
-        description: The higher range of the prediction value
+        description: The upper range of the prediction value
       predictionMidpoint:
         type: number
         format: double
@@ -195,6 +195,10 @@ definitions:
     type: object
     description: Information about a running Task
     properties:
+      uri:
+        type: string
+        format: uri
+        description: The URI of the Task
       progress:
         type: number
         minimum: 0
