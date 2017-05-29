@@ -2,9 +2,9 @@ swagger: '2.0'
 info:
   title: Conformal Prediction Log D 
   description: >-
-    This is a Conformal Prediction Service for predicting Log D values. The 
-    model has been trained and evaluated on ChEMBL 23 data. Modeling is done using
-    CPSign (product of GenettaSoft AB).
+    This is a Conformal Prediction Service for predicting Log D values for compounds. The 
+    underlying model has been trained and evaluated on ChEMBL 23 data. Modeling is done using
+    CPSign, product of GenettaSoft AB.
   version: 0.0.1
   contact:
     name: CPSign Support
@@ -15,7 +15,10 @@ schemes:
   - http
 produces:
   - application/json
+consumes:
+  - multipart/form-data
 paths:
+
 
   /logd:
     get:
@@ -23,6 +26,7 @@ paths:
         - Predict
       produces:
         - application/json
+      summary: Predict a single compound in SMILES format
       parameters:
         - $ref: "#/parameters/smiles"
         - name: confidence
@@ -47,11 +51,59 @@ paths:
           description: Server error
           schema:
             $ref: "#/definitions/Error"
-          
+    post:
+      tags: 
+        - Predict
+      produces:
+        - application/json
+      summary: Predict the result from a complete file, either in SDF or SMILES (one SMILES per line)
+      description: >-
+        Predict the result from a complete file, either in SDF or SMILES (one SMILES per line).
+        <b>Either</b> upload the datafile <b>or</b> send a URI where the dataset can be read from (must be a publically
+        accessible URI). The file will be predicted and new properties will be added to the properties already present
+        in the file. The result from this endpoint is the URI of a <b>Task</b> that should be queried for when the 
+        prediction has finished.
+      parameters:
+        - name: uri
+          in: query
+          description: A dataset to be predicted
+          required: false
+          type: string
+        - name: dataFile
+          in: formData
+          type: file
+          required: false
+          description: A dataset to be predicted
+        - name: confidence
+          in: query
+          description: The desired confidence of the prediction
+          required: false
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          default: 0.8
+      responses:
+        '202':
+          description: Prediction accepted by server
+          schema:
+            $ref: "#/definitions/Prediction"
+        '400':
+          description: Bad request (missing dataset)
+          schema:
+            $ref: "#/definitions/Error"
+        '500':
+          description: Server error
+          schema:
+            $ref: "#/definitions/Error"
+
+
+
   /tasks:
     get:
       tags:
         - Task
+      summary: Get a list of all available tasks URIs
       description: Get a list of all available tasks URIs
       responses:
         '200':
@@ -61,10 +113,6 @@ paths:
             items:
               type: string
               description: URI of running tasks
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
         '500':
           description: Server error
           schema:
@@ -73,7 +121,8 @@ paths:
     get:
       tags:
         - Task
-      description: Get status of the task
+      summary: Get status of a specific task
+      description: Get status of a specific task
       parameters:
         - name: id
           in: path
@@ -90,49 +139,12 @@ paths:
           description: Task is running
           schema:
             $ref: "#/definitions/TaskInfo"
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
         '404':
           description: Task for id not found
           schema:
             $ref: '#/definitions/Error'
         '502':
           description: Task has failed
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    delete:
-      tags:
-        - Task
-      description: Delete (cancel) a task
-      parameters:
-        - name: id
-          in: path
-          description: The Task URI to query
-          type: string
-          required: true
-      responses:
-        '200':
-          description: Task successfully cancelled
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: Task for id not found
-          schema:
-            $ref: '#/definitions/Error'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
 
@@ -154,7 +166,7 @@ definitions:
       message:
         type: string
         description: Error message
-  smiles:
+  SMILES:
     type: string
     description: Compound structure notated using SMILES notation
     x-ontology: http://edamontology.org/format_1196
@@ -163,7 +175,7 @@ definitions:
     description: Prediction result
     properties:
       smiles:
-        $ref: "#/definitions/smiles"
+        $ref: "#/definitions/SMILES"
       rangeLow:
         type: number
         format: double
