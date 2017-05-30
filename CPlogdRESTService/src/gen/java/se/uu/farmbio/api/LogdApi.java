@@ -18,8 +18,9 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import io.swagger.annotations.ApiParam;
 import se.uu.farmbio.api.factories.LogdApiServiceFactory;
-import se.uu.farmbio.model.Error;
-import se.uu.farmbio.model.Prediction;
+import se.uu.farmbio.models.BadRequestError;
+import se.uu.farmbio.models.Error;
+import se.uu.farmbio.models.Prediction;
 
 @Path("/logd")
 @Consumes({ "multipart/form-data" })
@@ -36,7 +37,7 @@ public class LogdApi  {
 	@io.swagger.annotations.ApiResponses(value = { 
 			@io.swagger.annotations.ApiResponse(code = 200, message = "prediction result", response = Prediction.class),
 
-			@io.swagger.annotations.ApiResponse(code = 400, message = "SMILES not possible to parse", response = Error.class),
+			@io.swagger.annotations.ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
 
 			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdGet(@ApiParam(value = "Compound structure notation using SMILES notation",required=true) @QueryParam("smiles") String smiles
@@ -53,9 +54,9 @@ public class LogdApi  {
 	@io.swagger.annotations.ApiResponses(value = { 
 			@io.swagger.annotations.ApiResponse(code = 302, message = "Prediction accepted by server - redirect to prediction task to query", response = void.class),
 
-			@io.swagger.annotations.ApiResponse(code = 400, message = "Bad request (missing dataset)", response = void.class),
+			@io.swagger.annotations.ApiResponse(code = 400, message = "Bad request (missing dataset)", response = BadRequestError.class),
 
-			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = void.class) })
+			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdPost(@ApiParam(value = "A dataset to be predicted") @QueryParam("uri") String uri
 			,
 			@FormDataParam("dataFile") InputStream dataFileInputStream,

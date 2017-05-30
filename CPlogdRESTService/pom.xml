@@ -91,6 +91,12 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>com.genettasoft</groupId>
+			<artifactId>cpsign.internal</artifactId>
+			<version>${cpsign.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.swagger</groupId>
 			<artifactId>swagger-jersey2-jaxrs</artifactId>
 			<scope>compile</scope>
@@ -168,6 +174,7 @@
 		</repository>
 	</repositories>
 	<properties>
+		<cpsign.version>0.5.6</cpsign.version>
 		<java.version>1.7</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>

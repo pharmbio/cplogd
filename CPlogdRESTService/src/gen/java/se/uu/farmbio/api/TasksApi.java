@@ -11,7 +11,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import io.swagger.annotations.ApiParam;
 import se.uu.farmbio.api.factories.TasksApiServiceFactory;
-import se.uu.farmbio.model.TaskInfo;
+import se.uu.farmbio.models.TaskInfo;
 
 @Path("/tasks")
 @Consumes({ "multipart/form-data" })
