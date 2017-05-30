@@ -4,7 +4,7 @@ import com.genettasoft.modeling.CPSignFactory;
 
 public class CPSignUtils {
 	
-	public static CPSignFactory getFactory(){
+	public static CPSignFactory getFactory() throws IllegalArgumentException {
 		try{
 			CPSignFactory factory = new CPSignFactory(CPSignUtils.class.getClassLoader().getResourceAsStream("cpsign0.5-standard.license"));
 			return factory;
