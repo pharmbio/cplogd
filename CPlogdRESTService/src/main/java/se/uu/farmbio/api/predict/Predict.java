@@ -1,30 +1,35 @@
 package se.uu.farmbio.api.predict;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.Iterator;
 
 import javax.ws.rs.core.Response;
 
-import org.javatuples.Pair;
+import org.apache.commons.io.IOUtils;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.genettasoft.modeling.CPSignFactory;
-import com.genettasoft.modeling.ISaveableModel;
 import com.genettasoft.modeling.acp.ACPRegressionResult;
-import com.genettasoft.modeling.cheminf.SignaturesACPClassification;
+import com.genettasoft.modeling.app.PredictionResultOutputter;
 import com.genettasoft.modeling.cheminf.SignaturesACPRegression;
-import com.genettasoft.modeling.cheminf.SignaturesTCPClassification;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
+import com.genettasoft.modeling.io.chemreader.IteratingSMILESWithPropertiesReader;
+import com.genettasoft.modeling.io.chemreader.JSONChemFileReader;
+import com.genettasoft.modeling.io.chemreader.MolReaderFactory;
 
-import se.uu.farmbio.api.StringUtil;
-import se.uu.farmbio.models.Prediction;
 import se.uu.farmbio.api.responses.ResponseFactory;
+import se.uu.farmbio.models.Prediction;
 
 public class Predict {
 
@@ -41,7 +46,7 @@ public class Predict {
 		cpsignRoot.setLevel(ch.qos.logback.classic.Level.OFF);
 		// Instantiate the factory 
 		try{
-			CPSignUtils.getFactory();
+			Utils.getFactory();
 			logger.debug("Initiated the CPSignFactory");
 		} catch (RuntimeException re){
 			logger.debug("Got exception when trying to instantiate CPSignFactory: " + re.getMessage());
@@ -63,6 +68,14 @@ public class Predict {
 	}
 
 
+	/*
+	 * =====================================================================================================================
+	 * 
+	 * 									SINGLE PREDICTION
+	 * 
+	 * =====================================================================================================================
+	 */
+
 	public static synchronized Response doSinglePredict(String smiles, double confidence) {
 		logger.debug("got a prediction task, smiles="+smiles + " , conf=" + confidence);
 		if (smiles==null || smiles.isEmpty()){
@@ -77,7 +90,7 @@ public class Predict {
 			logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping");
 			return ResponseFactory.badRequestResponse(400, "Invalid query SMILES:" + smiles, Arrays.asList("smiles"));
 		}
-		
+
 		try {
 			ACPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
 			return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat()));
@@ -86,34 +99,171 @@ public class Predict {
 			return ResponseFactory.errorResponse(500, "Server error predicting");
 		}
 	}
-	
-	public static synchronized Response doFilePredict(String smiles, double confidence) {
-		logger.debug("got a prediction task, smiles="+smiles + " , conf=" + confidence);
-		if (smiles==null || smiles.isEmpty()){
-			logger.debug("Missing arguments 'smiles'");
-			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("smiles"));
+
+
+
+	/*
+	 * =====================================================================================================================
+	 * 
+	 * 									MULTIPLE PREDICTIONS
+	 * 
+	 * =====================================================================================================================
+	 */
+
+
+	/**
+	 * For URI
+	 * @param predictURI
+	 * @param confidence
+	 * @return
+	 */
+	public static Response doUriPredict(URI predictURI, double confidence) {
+		logger.debug("got a prediction task, uri="+ predictURI + " , conf=" + confidence);
+		if (predictURI==null){
+			logger.debug("Missing arguments 'predictURI'");
+			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("uri"));
 		}
 
-		IAtomContainer molToPredict=null;
+		// Iterator over molecules
+		Iterator<IAtomContainer> molsIterator = null;
+
 		try{
-			molToPredict = CPSignFactory.parseSMILES(smiles);
-		} catch(IllegalArgumentException e){
-			logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping");
-			return ResponseFactory.badRequestResponse(400, "Invalid query SMILES:" + smiles, Arrays.asList("smiles"));
+			molsIterator = MolReaderFactory.getIterator(predictURI);
+			if(!molsIterator.hasNext()){
+				logger.debug("Could not parse any molecules from URI");
+				return ResponseFactory.badRequestResponse(400, "No molecules found in uri", Arrays.asList("uri"));
+			}
+		} catch (Exception e) {
+			logger.debug("Could not parse the URI at all");
+			return ResponseFactory.badRequestResponse(400, "URI could not be read", Arrays.asList("uri"));
 		}
-		
-		try {
-			ACPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
-			return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat()));
-		} catch (IllegalAccessException | CDKException e) {
-			logger.debug("Failed predicting smiles=" + smiles, e);
-			return ResponseFactory.errorResponse(500, "Server error predicting");
-		}
+
+
+		boolean isSMILESInput = (molsIterator instanceof IteratingSMILESWithPropertiesReader ? true : false	);
+		boolean isSDFInput = (molsIterator instanceof IteratingSDFReader ? true : false);
+		boolean isJSONInput = (molsIterator instanceof JSONChemFileReader ? true : false);
+
+		// Setup results output
+		//		File tmpResultFile = File.createTempFile("prediction_output", ".tmp");
+		//		tmpResultFile.deleteOnExit();
+
+		//		doMultiPredict(molsIterator, outputter, confidence)
+
+		return ResponseFactory.taskAccepted("taskURI - TODO");
 	}
 
 
 
-/*
+	/**
+	 * For dataFile
+	 * @param fileInputStream
+	 * @param confidence
+	 * @return
+	 */
+	public static Response doFilePredict(InputStream fileInputStream, double confidence) {
+		//		logger.debug("got a prediction task, smiles="+smiles + " , conf=" + confidence);
+		if (fileInputStream==null){
+			logger.debug("Missing arguments 'fileInputStream'");
+			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("dataFile"));
+		}
+
+		// We have to copy it to local (for now at least)
+		File tmpPredictFile = null;
+		try{
+			tmpPredictFile = File.createTempFile("molecules.predict", ".tmp");
+			tmpPredictFile.deleteOnExit();
+			IOUtils.copyLarge(fileInputStream, new BufferedOutputStream(new FileOutputStream(tmpPredictFile)));	
+		} catch (Exception e) {
+			logger.debug("Could not copy POST'ed file", e);
+			return ResponseFactory.badRequestResponse(400, "Failed uploading file", "dataFile");
+		}
+
+		// Iterator over molecules
+		Iterator<IAtomContainer> molsIterator = null;
+
+		try{
+			molsIterator = MolReaderFactory.getIterator(tmpPredictFile.toURI());
+			if(!molsIterator.hasNext()){
+				logger.debug("Could not parse any molecules from dataFile");
+				return ResponseFactory.badRequestResponse(400, "No molecules found in file", Arrays.asList("dataFile"));
+			}
+		} catch (Exception e) {
+			logger.debug("Could not parse the dataFile at all");
+			return ResponseFactory.badRequestResponse(400, "dataFile could not be read", Arrays.asList("dataFile"));
+		}
+
+
+		boolean isSMILESInput = (molsIterator instanceof IteratingSMILESWithPropertiesReader ? true : false	);
+		boolean isSDFInput = (molsIterator instanceof IteratingSDFReader ? true : false);
+		boolean isJSONInput = (molsIterator instanceof JSONChemFileReader ? true : false);
+
+		//		IAtomContainer molToPredict=null;
+		//		try{
+		//			molToPredict = CPSignFactory.parseSMILES(smiles);
+		//		} catch(IllegalArgumentException e){
+		//			logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping");
+		//			return ResponseFactory.badRequestResponse(400, "Invalid query SMILES:" + smiles, Arrays.asList("smiles"));
+		//		}
+
+		//		try {
+		//			ACPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
+		//			return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat()));
+		//		} catch (IllegalAccessException | CDKException e) {
+		//			logger.debug("Failed predicting smiles=" + smiles, e);
+		//			return ResponseFactory.errorResponse(500, "Server error predicting");
+		//		}
+
+		return ResponseFactory.notImplementedYet();
+	}
+
+
+	public class PredictRunnable implements Runnable {
+		private Iterator<IAtomContainer> mols;
+		private PredictionResultOutputter outputter; 
+		private double confidence;
+
+		public PredictRunnable(Iterator<IAtomContainer> mols, PredictionResultOutputter outputter, double confidence){
+			this.mols = mols;
+			this.outputter = outputter;
+			this.confidence = confidence;
+		}
+
+		public void run() {
+
+			IAtomContainer mol;
+			int numSuccess=0, numFailed=0;
+			
+			while (mols.hasNext()){
+				mol = mols.next();
+
+				try{
+					ACPRegressionResult res = signaturesACPReg.predict(mol, confidence);
+					mol.setProperty("lower", res.getInterval().getValue(0));
+					mol.setProperty("higher", res.getInterval().getValue(1));
+					mol.setProperty("predictionMidpoint", res.getY_hat());
+					outputter.writeMol(mol, null, null, null); //Arrays.asList(res.getInterval().getValue0(), res.getInterval().getValue1()));
+					numSuccess++;
+				} catch (Exception e) {
+					numFailed++;
+				}
+				
+			}
+			if (numSuccess == 0) {
+				
+			}
+		}
+
+	}
+
+
+	private static synchronized void doMultiPredict(Iterator<IAtomContainer> mols, PredictionResultOutputter outputter, double confidence) {
+
+
+	}
+
+
+
+	/*
 	public static Response doPredict(String id, String datasetUri, String smiles, double confidence) {
 		logger.debug("got a prediction task, id=" + id + ", smiles="+smiles);
 		try{
@@ -215,6 +365,6 @@ public class Predict {
 
 		return new Prediction(smiles, res);
 	}
-*/
+	 */
 
 }
