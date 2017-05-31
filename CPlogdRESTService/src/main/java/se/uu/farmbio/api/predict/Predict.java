@@ -101,7 +101,7 @@ public class Predict {
 		try {
 			ACPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
 			CDKMutexLock.releaseLock();
-			return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat()));
+			return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence));
 		} catch (IllegalAccessException | CDKException e) {
 			logger.debug("Failed predicting smiles=" + smiles, e);
 			CDKMutexLock.releaseLock();

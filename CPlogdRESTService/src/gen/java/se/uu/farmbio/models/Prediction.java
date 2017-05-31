@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import se.uu.farmbio.api.predict.Utils;
 
 /**
  * Prediction result
@@ -38,11 +39,15 @@ public class Prediction   {
 	@JsonProperty("predictionMidpoint")
 	private Double predictionMidpoint = null;
 	
-	public Prediction(String smiles, double lower, double upper, double mp) {
+	@JsonProperty("confidence")
+	private Double confidence = null;
+	
+	public Prediction(String smiles, double lower, double upper, double mp, double confidence) {
 		this.smiles = smiles;
 		this.lower = lower;
 		this.upper = upper;
 		this.predictionMidpoint = mp;
+		this.confidence = confidence;
 	}
 
 	/**
@@ -84,6 +89,16 @@ public class Prediction   {
 	public Double getPredictionMidpoint() {
 		return predictionMidpoint;
 	}
+	
+	/**
+	 * The confidence of the prediction 
+	 * @return confidence
+	 */
+	@JsonProperty("confidence")
+	@ApiModelProperty(value = "The confidence of the prediction")
+	public Double getConfidence() {
+		return confidence;
+	}
 
 
 	@Override
@@ -113,9 +128,10 @@ public class Prediction   {
 		sb.append("{\n");
 
 		sb.append("    smiles: ").append(toIndentedString(smiles)).append(",\n");
-		sb.append("    lower: ").append(toIndentedString(lower)).append(",\n");
-		sb.append("    upper: ").append(toIndentedString(upper)).append(",\n");
-		sb.append("    predictionMidpoint: ").append(toIndentedString(predictionMidpoint)).append("\n");
+		sb.append("    lower: ").append(toIndentedString(Utils.roundTo3digits(lower))).append(",\n");
+		sb.append("    upper: ").append(toIndentedString(Utils.roundTo3digits(upper))).append(",\n");
+		sb.append("    predictionMidpoint: ").append(toIndentedString(Utils.roundTo3digits(predictionMidpoint))).append(",\n");
+		sb.append("    confidence: ").append(toIndentedString(confidence)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
