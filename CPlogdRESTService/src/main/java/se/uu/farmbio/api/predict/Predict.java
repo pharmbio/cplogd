@@ -45,9 +45,9 @@ public class Predict {
 		// Instantiate the factory 
 		try{
 			Utils.getFactory();
-			logger.debug("Initiated the CPSignFactory");
+			logger.info("Initiated the CPSignFactory");
 		} catch (RuntimeException re){
-			logger.debug("Got exception when trying to instantiate CPSignFactory: " + re.getMessage());
+			logger.info("Got exception when trying to instantiate CPSignFactory: " + re.getMessage());
 			serverErrorResponse = ResponseFactory.errorResponse(500, re.getMessage());
 
 		}
@@ -56,7 +56,7 @@ public class Predict {
 			try {
 				logger.debug("Trying to load in the model");
 				signaturesACPReg = (SignaturesACPRegression) BNDLoader.loadModel(Predict.class.getResource(MODEL).toURI(), null);
-				logger.debug("Finished initializing the server with the loaded model");
+				logger.info("Finished initializing the server with the loaded model");
 			} catch (IllegalAccessException | IOException | URISyntaxException e) {
 				logger.debug("Could not load the model", e);
 				serverErrorResponse = ResponseFactory.errorResponse(500, "Server error - could not load the built model");
@@ -75,7 +75,7 @@ public class Predict {
 	 */
 
 	public static Response doSinglePredict(String smiles, double confidence) {
-		logger.debug("got a prediction task, smiles="+smiles + " , conf=" + confidence);
+		logger.info("got a prediction task, smiles="+smiles + " , conf=" + confidence);
 		if (smiles==null || smiles.isEmpty()){
 			logger.debug("Missing arguments 'smiles'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("smiles"));
@@ -120,7 +120,7 @@ public class Predict {
 	 * @return
 	 */
 	public static Response doUriPredict(URI predictURI, double confidence) {
-		logger.debug("got a prediction task, uri="+ predictURI + " , conf=" + confidence);
+		logger.info("got a prediction task, uri="+ predictURI + " , conf=" + confidence);
 		if (predictURI==null){
 			logger.debug("Missing arguments 'predictURI'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("uri"));
@@ -173,7 +173,7 @@ public class Predict {
 	 * @return
 	 */
 	public static Response doFilePredict(InputStream fileInputStream, double confidence) {
-		//		logger.debug("got a prediction task, smiles="+smiles + " , conf=" + confidence);
+		logger.info("got a prediction task with posted file" + " , conf=" + confidence);
 		if (fileInputStream==null){
 			logger.debug("Missing arguments 'fileInputStream'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("dataFile"));

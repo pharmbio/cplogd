@@ -31,7 +31,7 @@ public class LogdApi  {
 	private final LogdApiService delegate = LogdApiServiceFactory.getLogdApi();
 
 	@GET
-	//	@Consumes({ "multipart/form-data" })
+	@Consumes({ "multipart/form-data" })
 	@Produces({ "application/json" })
 	@io.swagger.annotations.ApiOperation(value = "Predict a single compound in SMILES format", notes = "", response = void.class, tags={ "Predict", })
 	@io.swagger.annotations.ApiResponses(value = { 
