@@ -8,25 +8,19 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.genettasoft.modeling.CPSignFactory;
 import com.genettasoft.modeling.acp.ACPRegressionResult;
-import com.genettasoft.modeling.app.PredictionResultOutputter;
 import com.genettasoft.modeling.cheminf.SignaturesACPRegression;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
-import com.genettasoft.modeling.io.chemreader.IteratingSMILESWithPropertiesReader;
-import com.genettasoft.modeling.io.chemreader.JSONChemFileReader;
-import com.genettasoft.modeling.io.chemreader.MolReaderFactory;
 
 import se.uu.farmbio.api.responses.ResponseFactory;
 import se.uu.farmbio.models.Prediction;
@@ -38,6 +32,10 @@ public class Predict {
 
 	private static Response serverErrorResponse = null;
 	private static SignaturesACPRegression signaturesACPReg = null;
+
+	public static SignaturesACPRegression getModel() {
+		return signaturesACPReg;
+	}
 
 	static {
 		// Get the root logger for cpsign
@@ -128,27 +126,34 @@ public class Predict {
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("uri"));
 		}
 
-		// Iterator over molecules
-		Iterator<IAtomContainer> molsIterator = null;
-		CDKMutexLock.requireLock();
-		try{
-			molsIterator = MolReaderFactory.getIterator(predictURI);
-			if(!molsIterator.hasNext()){
-				logger.debug("Could not parse any molecules from URI");
-				CDKMutexLock.releaseLock();
-				return ResponseFactory.badRequestResponse(400, "No molecules found in uri", Arrays.asList("uri"));
-			}
-		} catch (Exception e) {
-			logger.debug("Could not parse the URI at all");
-			CDKMutexLock.releaseLock();
-			return ResponseFactory.badRequestResponse(400, "URI could not be read", Arrays.asList("uri"));
-		}
-		
-		CDKMutexLock.releaseLock();
 
-		boolean isSMILESInput = (molsIterator instanceof IteratingSMILESWithPropertiesReader ? true : false	);
-		boolean isSDFInput = (molsIterator instanceof IteratingSDFReader ? true : false);
-		boolean isJSONInput = (molsIterator instanceof JSONChemFileReader ? true : false);
+		// Spawn a new thread to do the work - send a Task back as 'task accepted'
+		// Get the task ID from backend
+		int taskID = 42; // TODO
+		new Thread(new PredictRunnable(predictURI, confidence, taskID)).start();
+
+
+		//		// Iterator over molecules
+		//		Iterator<IAtomContainer> molsIterator = null;
+		//		CDKMutexLock.requireLock();
+		//		try{
+		//			molsIterator = MolReaderFactory.getIterator(predictURI);
+		//			if(!molsIterator.hasNext()){
+		//				logger.debug("Could not parse any molecules from URI");
+		//				CDKMutexLock.releaseLock();
+		//				return ResponseFactory.badRequestResponse(400, "No molecules found in uri", Arrays.asList("uri"));
+		//			}
+		//		} catch (Exception e) {
+		//			logger.debug("Could not parse the URI at all");
+		//			CDKMutexLock.releaseLock();
+		//			return ResponseFactory.badRequestResponse(400, "URI could not be read", Arrays.asList("uri"));
+		//		}
+		//
+		//		CDKMutexLock.releaseLock();
+
+		//		boolean isSMILESInput = (molsIterator instanceof IteratingSMILESWithPropertiesReader ? true : false	);
+		//		boolean isSDFInput = (molsIterator instanceof IteratingSDFReader ? true : false);
+		//		boolean isJSONInput = (molsIterator instanceof JSONChemFileReader ? true : false);
 
 		// Setup results output
 		//		File tmpResultFile = File.createTempFile("prediction_output", ".tmp");
@@ -185,27 +190,32 @@ public class Predict {
 			return ResponseFactory.badRequestResponse(400, "Failed uploading file", "dataFile");
 		}
 
+		// Spawn a new thread to do the work - send a Task back as 'task accepted'
+		// Get the task ID from backend
+		int taskID = 42; // TODO
+		new Thread(new PredictRunnable(tmpPredictFile, confidence, taskID)).start();
+
 		// Iterator over molecules
-		Iterator<IAtomContainer> molsIterator = null;
-		CDKMutexLock.requireLock();
-		try{
-			molsIterator = MolReaderFactory.getIterator(tmpPredictFile.toURI());
-			if(!molsIterator.hasNext()){
-				logger.debug("Could not parse any molecules from dataFile");
-				CDKMutexLock.releaseLock();
-				return ResponseFactory.badRequestResponse(400, "No molecules found in file", Arrays.asList("dataFile"));
-			}
-		} catch (Exception e) {
-			logger.debug("Could not parse the dataFile at all");
-			CDKMutexLock.releaseLock();
-			return ResponseFactory.badRequestResponse(400, "dataFile could not be read", Arrays.asList("dataFile"));
-		}
-		CDKMutexLock.releaseLock();
+		//		Iterator<IAtomContainer> molsIterator = null;
+		//		CDKMutexLock.requireLock();
+		//		try{
+		//			molsIterator = MolReaderFactory.getIterator(tmpPredictFile.toURI());
+		//			if(!molsIterator.hasNext()){
+		//				logger.debug("Could not parse any molecules from dataFile");
+		//				CDKMutexLock.releaseLock();
+		//				return ResponseFactory.badRequestResponse(400, "No molecules found in file", Arrays.asList("dataFile"));
+		//			}
+		//		} catch (Exception e) {
+		//			logger.debug("Could not parse the dataFile at all");
+		//			CDKMutexLock.releaseLock();
+		//			return ResponseFactory.badRequestResponse(400, "dataFile could not be read", Arrays.asList("dataFile"));
+		//		}
+		//		CDKMutexLock.releaseLock();
 
 
-		boolean isSMILESInput = (molsIterator instanceof IteratingSMILESWithPropertiesReader ? true : false	);
-		boolean isSDFInput = (molsIterator instanceof IteratingSDFReader ? true : false);
-		boolean isJSONInput = (molsIterator instanceof JSONChemFileReader ? true : false);
+		//		boolean isSMILESInput = (molsIterator instanceof IteratingSMILESWithPropertiesReader ? true : false	);
+		//		boolean isSDFInput = (molsIterator instanceof IteratingSDFReader ? true : false);
+		//		boolean isJSONInput = (molsIterator instanceof JSONChemFileReader ? true : false);
 
 		//		IAtomContainer molToPredict=null;
 		//		try{
@@ -224,119 +234,6 @@ public class Predict {
 		//		}
 
 		return ResponseFactory.taskAccepted("Task accepted - TODO");
-	}
-
-
-	public class PredictRunnable implements Runnable {
-//		private Iterator<IAtomContainer> mols;
-//		private PredictionResultOutputter outputter;
-		private URI remoteURISource;
-		private File uploadedFileSource;
-		private boolean predictFromURI;
-		private double confidence;
-		private int TASK_ID;
-		private File resultsFile;
-
-		
-		public PredictRunnable(URI remoteURI, double confidence, int taskID) {
-			this.remoteURISource = remoteURI;
-			this.confidence = confidence;
-			this.TASK_ID = taskID;
-			this.predictFromURI = true;
-		}
-		
-		public PredictRunnable(File uploadedFile, double confidence, int taskID) {
-			this.uploadedFileSource = uploadedFile;
-			this.confidence = confidence;
-			this.TASK_ID = taskID;
-			this.predictFromURI = false;
-		}
-		
-
-		public void run() {
-			
-			// create a tmp file for storing the output - should be transfered to backend once done
-			try {
-				resultsFile = File.createTempFile("prediction.output." + TASK_ID, ".tmp");
-			} catch (IOException e1) {
-				logger.debug("Could not create a temporary file for prediction output");
-				exitWithFailure("Server Error - Could not create a temporary file for prediction output");
-			}
-			resultsFile.deleteOnExit();
-			
-			
-			CDKMutexLock.requireLock();
-			
-			// create an iterator
-			Iterator<IAtomContainer> mols = null;
-			try {
-				mols = MolReaderFactory.getIterator((predictFromURI? remoteURISource : uploadedFileSource.toURI()));
-				if(! mols.hasNext())
-					exitWithFailure("No molecules successfully parsed from given input");
-			} catch (IOException e) {
-				if(predictFromURI) {
-					logger.debug("Could not parse the given URI: " + remoteURISource,e);
-					exitWithFailure("Could not read from the given URI: " + remoteURISource);
-				} else {
-					logger.debug("Could not parse the given dataFile",e);
-					exitWithFailure("Could not read from the uploaded file");
-				}
-			}
-			
-			
-			
-			
-			// create the output
-			PredictionResultOutputter outputter = null;
-			if (mols instanceof IteratingSMILESWithPropertiesReader) {
-//				outputter = new PredictionResultOutputter().
-			}
-				boolean isSDFInput = (mols instanceof IteratingSDFReader ? true : false);
-				boolean isJSONInput = (mols instanceof JSONChemFileReader ? true : false);
-			
-
-			IAtomContainer mol;
-			int numSuccess=0, numFailed=0;
-			
-			
-			
-			while (mols.hasNext()){
-				mol = mols.next();
-
-				try{
-					ACPRegressionResult res = signaturesACPReg.predict(mol, confidence);
-					mol.setProperty("lower", res.getInterval().getValue(0));
-					mol.setProperty("higher", res.getInterval().getValue(1));
-					mol.setProperty("predictionMidpoint", res.getY_hat());
-					outputter.writeMol(mol, null, null, null);
-					numSuccess++;
-				} catch (Exception e) {
-					numFailed++;
-				}
-				
-			}
-			if (numSuccess == 0) {
-				
-			}
-		}
-		
-		/**
-		 * Make sure to explicitly delete any results to release memory and release
-		 * the CDK-lock for serialization
-		 */
-		private void exitWithFailure(String errorMsg){
-			if(resultsFile!=null)
-				resultsFile.delete();
-			CDKMutexLock.releaseLock();
-			// Update backend with error-message TODO
-		}
-
-	}
-
-
-	private static synchronized void doMultiPredict(Iterator<IAtomContainer> mols, PredictionResultOutputter outputter, double confidence) {
-
-
 	}
 
 
