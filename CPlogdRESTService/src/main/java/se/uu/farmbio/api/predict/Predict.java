@@ -47,23 +47,26 @@ public class Predict {
 			Utils.getFactory();
 			logger.info("Initiated the CPSignFactory");
 		} catch (RuntimeException re){
-			logger.info("Got exception when trying to instantiate CPSignFactory: " + re.getMessage());
+			logger.error("Got exception when trying to instantiate CPSignFactory: " + re.getMessage());
 			serverErrorResponse = ResponseFactory.errorResponse(500, re.getMessage());
-
 		}
-		// load the model
-		if(serverErrorResponse != null) {
+		// load the model - only if no error previously encountered
+		if (serverErrorResponse == null) {
 			try {
 				logger.debug("Trying to load in the model");
-				signaturesACPReg = (SignaturesACPRegression) BNDLoader.loadModel(Predict.class.getResource(MODEL).toURI(), null);
+				URI modelURI = Predict.class.getClassLoader().getResource(MODEL).toURI();
+				if(modelURI == null)
+					throw new IOException("did not locate the model file");
+				signaturesACPReg = (SignaturesACPRegression) BNDLoader.loadModel(modelURI, null);
 				logger.info("Finished initializing the server with the loaded model");
 			} catch (IllegalAccessException | IOException | URISyntaxException e) {
-				logger.debug("Could not load the model", e);
+				logger.error("Could not load the model", e);
 				serverErrorResponse = ResponseFactory.errorResponse(500, "Server error - could not load the built model");
 			}
 		}
 
 	}
+	
 
 
 	/*
@@ -76,6 +79,10 @@ public class Predict {
 
 	public static Response doSinglePredict(String smiles, double confidence) {
 		logger.info("got a prediction task, smiles="+smiles + " , conf=" + confidence);
+		
+		if(serverErrorResponse != null)
+			return serverErrorResponse;
+		
 		if (smiles==null || smiles.isEmpty()){
 			logger.debug("Missing arguments 'smiles'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("smiles"));
@@ -125,6 +132,9 @@ public class Predict {
 			logger.debug("Missing arguments 'predictURI'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("uri"));
 		}
+		
+		if(serverErrorResponse != null)
+			return serverErrorResponse;
 
 
 		// Spawn a new thread to do the work - send a Task back as 'task accepted'
@@ -178,6 +188,9 @@ public class Predict {
 			logger.debug("Missing arguments 'fileInputStream'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("dataFile"));
 		}
+		
+		if(serverErrorResponse != null)
+			return serverErrorResponse;
 
 		// We have to copy it to local (for now at least)
 		File tmpPredictFile = null;
