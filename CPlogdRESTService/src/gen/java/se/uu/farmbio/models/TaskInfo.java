@@ -125,7 +125,6 @@ public class TaskInfo   {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{\n");
-
 		sb.append("    uri: ").append(toIndentedString(uri)).append(",\n");
 		sb.append("    progress: ").append(toIndentedString(progress)).append(",\n");
 		sb.append("    currentRuntime: ").append(toIndentedString(currentRuntime)).append("\n");

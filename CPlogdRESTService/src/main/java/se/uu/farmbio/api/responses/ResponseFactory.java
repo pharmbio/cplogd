@@ -1,5 +1,6 @@
 package se.uu.farmbio.api.responses;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,8 +49,11 @@ public class ResponseFactory {
 	}
 	
 	public static Response taskAccepted(String taskURI){
-		return Response.status(202)
-				.entity(taskURI).build();
+		try{
+			return Response.accepted().location(new URI(taskURI)).build();
+		} catch (Exception e) {
+			return errorResponse(500, "Server Error - could not create the task-uri");
+		}
 	}
 
 }

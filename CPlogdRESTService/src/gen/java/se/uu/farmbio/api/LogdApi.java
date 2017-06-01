@@ -52,7 +52,7 @@ public class LogdApi  {
 	@Produces({ "application/json" })
 	@io.swagger.annotations.ApiOperation(value = "Predict the result from a complete file, either in SDF or SMILES (one SMILES per line)", notes = "Predict the result from a complete file, either in SDF or SMILES (one SMILES per line). <b>Either</b> upload the datafile <b>or</b> send a URI where the dataset can be read from (must be a publically accessible URI). The file will be predicted and new properties will be added to the properties already present in the file. The result from this endpoint is the URI of a <b>Task</b> that should be queried for when the  prediction has finished.", response = void.class, tags={ "Predict", })
 	@io.swagger.annotations.ApiResponses(value = { 
-			@io.swagger.annotations.ApiResponse(code = 302, message = "Prediction accepted by server - redirect to prediction task to query", response = void.class),
+			@io.swagger.annotations.ApiResponse(code = 202, message = "Prediction accepted by server - redirect to prediction task to query", response = void.class),
 
 			@io.swagger.annotations.ApiResponse(code = 400, message = "Bad request (missing dataset)", response = BadRequestError.class),
 
