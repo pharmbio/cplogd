@@ -13,11 +13,12 @@
 
 package se.uu.farmbio.models;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+
+import org.json.simple.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -34,10 +35,16 @@ public class TaskInfo   {
 	private String uri = null;
 
 	@JsonProperty("progress")
-	private BigDecimal progress = null;
+	private Double progress = null;
 
 	@JsonProperty("currentRuntime")
-	private BigDecimal currentRuntime = null;
+	private Double currentRuntime = null;
+	
+	public TaskInfo(String uri, double progress, double runtime){
+		this.uri = uri;
+		this.progress = progress;
+		this.currentRuntime = runtime;
+	}
 
 	public TaskInfo uri(String uri) {
 		this.uri = uri;
@@ -58,7 +65,7 @@ public class TaskInfo   {
 		this.uri = uri;
 	}
 
-	public TaskInfo progress(BigDecimal progress) {
+	public TaskInfo progress(Double progress) {
 		this.progress = progress;
 		return this;
 	}
@@ -73,15 +80,15 @@ public class TaskInfo   {
 	@ApiModelProperty(value = "Progress [0-100%]")
 	@DecimalMin("0")
 	@DecimalMax("100")
-	public BigDecimal getProgress() {
+	public Double getProgress() {
 		return progress;
 	}
 
-	public void setProgress(BigDecimal progress) {
+	public void setProgress(Double progress) {
 		this.progress = progress;
 	}
 
-	public TaskInfo currentRuntime(BigDecimal currentRuntime) {
+	public TaskInfo currentRuntime(Double currentRuntime) {
 		this.currentRuntime = currentRuntime;
 		return this;
 	}
@@ -92,11 +99,11 @@ public class TaskInfo   {
 	 **/
 	@JsonProperty("currentRuntime")
 	@ApiModelProperty(value = "How long the task has been running (milliseconds)")
-	public BigDecimal getCurrentRuntime() {
+	public Double getCurrentRuntime() {
 		return currentRuntime;
 	}
 
-	public void setCurrentRuntime(BigDecimal currentRuntime) {
+	public void setCurrentRuntime(Double currentRuntime) {
 		this.currentRuntime = currentRuntime;
 	}
 
@@ -121,15 +128,14 @@ public class TaskInfo   {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{\n");
-		sb.append("    \"uri\": ").append(FormattingUtils.toIndentedString(uri)).append(",\n");
-		sb.append("    \"progress\": ").append(FormattingUtils.toIndentedString(progress)).append(",\n");
-		sb.append("    \"currentRuntime\": ").append(FormattingUtils.toIndentedString(currentRuntime)).append("\n");
-		sb.append("}");
-		return sb.toString();
+		JSONObject res = new JSONObject();
+		res.put("uri", uri);
+		res.put("progress", progress);
+		res.put("currentRuntime", currentRuntime);
+		return res.toJSONString();
 	}
 	
 }

@@ -15,6 +15,8 @@ package se.uu.farmbio.models;
 
 import java.util.Objects;
 
+import org.json.simple.JSONObject;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
@@ -122,17 +124,16 @@ public class Prediction   {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{\n");
-		sb.append("   \"smiles\": ").append("\""+smiles+"\"").append(",\n");
-		sb.append("   \"lower\": ").append(Utils.roundTo3digits(lower)).append(",\n");
-		sb.append("   \"upper\": ").append(Utils.roundTo3digits(upper)).append(",\n");
-		sb.append("   \"predictionMidpoint\": ").append(Utils.roundTo3digits(predictionMidpoint)).append(",\n");
-		sb.append("   \"confidence\": ").append(confidence).append("\n");
-		sb.append("}");
-		return sb.toString();
+		JSONObject resp = new JSONObject();
+		resp.put("smiles", smiles);
+		resp.put("lower", Utils.roundTo3digits(lower));
+		resp.put("upper", Utils.roundTo3digits(upper));
+		resp.put("predictionMidpoint", Utils.roundTo3digits(predictionMidpoint));
+		resp.put("confidence", Utils.roundTo3digits(confidence));
+		return resp.toJSONString();
 	}
 	
 }

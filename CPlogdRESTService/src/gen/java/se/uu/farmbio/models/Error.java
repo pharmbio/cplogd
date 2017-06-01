@@ -19,6 +19,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.json.simple.JSONObject;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
@@ -105,15 +107,13 @@ public class Error   {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{\n");
-
-		sb.append("    \"code\": ").append(FormattingUtils.toIndentedString(code)).append(",\n");
-		sb.append("    \"message\": ").append(FormattingUtils.toIndentedString("\""+message+"\"")).append("\n");
-		sb.append("}");
-		return sb.toString();
+		JSONObject res = new JSONObject();
+		res.put("code", code);
+		res.put("message", message);
+		return res.toJSONString();
 	}
 	
 }

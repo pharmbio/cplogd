@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.json.simple.JSONObject;
+
 import io.swagger.annotations.ApiModelProperty;
 
 
@@ -64,28 +66,18 @@ public class BadRequestError extends Error  {
 		return Objects.hash(getCode(), getMessage(), fields);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{\n");
-		sb.append("    \"code\": ").append(FormattingUtils.toIndentedString(getCode())).append(",\n");
-		sb.append("    \"message\": ").append(FormattingUtils.toIndentedString("\""+getMessage()+"\"")).append(",\n");
-		sb.append("    \"fields\": ").append(FormattingUtils.toIndentedString(fieldsToString())).append('\n');
-		sb.append("}\n");
-		return sb.toString();
+		JSONObject jsonResponse = new JSONObject();
+		jsonResponse.put("code", getCode());
+		jsonResponse.put("message", getMessage());
+		jsonResponse.put("fields", fields);
+		
+		return jsonResponse.toJSONString();
 	}
 	
-	private String fieldsToString() {
-		StringBuilder sb = new StringBuilder("[");
-		for(int i = 0; i<fields.size(); i++) {
-			sb.append("\""+fields.get(i)+"\"");
-			if (i < fields.size()-1)
-				sb.append(", ");
-		}
-		
-		sb.append("]");
-		return sb.toString();
-	}
+
 	
 }
 
