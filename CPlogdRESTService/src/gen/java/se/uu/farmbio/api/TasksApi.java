@@ -11,6 +11,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import io.swagger.annotations.ApiParam;
 import se.uu.farmbio.api.factories.TasksApiServiceFactory;
+import se.uu.farmbio.models.BadRequestError;
 import se.uu.farmbio.models.TaskInfo;
 
 @Path("/tasks")
@@ -25,7 +26,7 @@ public class TasksApi  {
 
 	@Consumes({ "multipart/form-data" })
 	@Produces({ "application/json" })
-	@io.swagger.annotations.ApiOperation(value = "Get a list of all available tasks URIs", notes = "Get a list of all available tasks URIs", response = String.class, responseContainer = "List", tags={ "Task", })
+	@io.swagger.annotations.ApiOperation(value = "<b>Internal Usage only</b>Get a list of all available tasks URIs", notes = "Get a list of all available tasks URIs", response = String.class, responseContainer = "List", tags={ "Task", })
 	@io.swagger.annotations.ApiResponses(value = { 
 			@io.swagger.annotations.ApiResponse(code = 200, message = "list of running tasks", response = String.class, responseContainer = "List"),
 
@@ -43,7 +44,9 @@ public class TasksApi  {
 			@io.swagger.annotations.ApiResponse(code = 202, message = "Task is running", response = TaskInfo.class),
 
 			@io.swagger.annotations.ApiResponse(code = 301, message = "Prediction has successfully finished", response = String.class),
-
+			
+			@io.swagger.annotations.ApiResponse(code = 400, message = "Bad request (malformatted id)", response = BadRequestError.class),
+			
 			@io.swagger.annotations.ApiResponse(code = 404, message = "Task for id not found", response = Error.class),
 
 			@io.swagger.annotations.ApiResponse(code = 502, message = "Task has failed", response = Error.class) })

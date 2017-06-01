@@ -125,22 +125,12 @@ public class TaskInfo   {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{\n");
-		sb.append("    uri: ").append(toIndentedString(uri)).append(",\n");
-		sb.append("    progress: ").append(toIndentedString(progress)).append(",\n");
-		sb.append("    currentRuntime: ").append(toIndentedString(currentRuntime)).append("\n");
+		sb.append("    \"uri\": ").append(FormattingUtils.toIndentedString(uri)).append(",\n");
+		sb.append("    \"progress\": ").append(FormattingUtils.toIndentedString(progress)).append(",\n");
+		sb.append("    \"currentRuntime\": ").append(FormattingUtils.toIndentedString(currentRuntime)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
-
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
+	
 }
 

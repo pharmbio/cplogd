@@ -126,25 +126,14 @@ public class Prediction   {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{\n");
-
-		sb.append("    smiles: ").append(toIndentedString(smiles)).append(",\n");
-		sb.append("    lower: ").append(toIndentedString(Utils.roundTo3digits(lower))).append(",\n");
-		sb.append("    upper: ").append(toIndentedString(Utils.roundTo3digits(upper))).append(",\n");
-		sb.append("    predictionMidpoint: ").append(toIndentedString(Utils.roundTo3digits(predictionMidpoint))).append(",\n");
-		sb.append("    confidence: ").append(toIndentedString(confidence)).append("\n");
+		sb.append("   \"smiles\": ").append("\""+smiles+"\"").append(",\n");
+		sb.append("   \"lower\": ").append(Utils.roundTo3digits(lower)).append(",\n");
+		sb.append("   \"upper\": ").append(Utils.roundTo3digits(upper)).append(",\n");
+		sb.append("   \"predictionMidpoint\": ").append(Utils.roundTo3digits(predictionMidpoint)).append(",\n");
+		sb.append("   \"confidence\": ").append(confidence).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
-
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
+	
 }
 

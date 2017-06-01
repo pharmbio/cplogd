@@ -95,7 +95,7 @@ public class Predict {
 		} catch(IllegalArgumentException e){
 			logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping");
 			CDKMutexLock.releaseLock();
-			return ResponseFactory.badRequestResponse(400, "Invalid query SMILES \"" + smiles + "\"", Arrays.asList("smiles"));
+			return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", Arrays.asList("smiles"));
 		}
 
 		try {
