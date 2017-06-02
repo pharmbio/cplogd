@@ -132,7 +132,7 @@ public class Prediction   {
 		resp.put("lower", Utils.roundTo3digits(lower));
 		resp.put("upper", Utils.roundTo3digits(upper));
 		resp.put("predictionMidpoint", Utils.roundTo3digits(predictionMidpoint));
-		resp.put("confidence", Utils.roundTo3digits(confidence));
+		resp.put("confidence", confidence);
 		return resp.toJSONString();
 	}
 	

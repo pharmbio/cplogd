@@ -40,8 +40,13 @@ public class Predict {
 	static {
 		// Get the root logger for cpsign
 		ch.qos.logback.classic.Logger cpsignRoot = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("com.genettasoft.modeling");
-		// Disable all output
+		// Disable all cpsign-output
 		cpsignRoot.setLevel(ch.qos.logback.classic.Level.OFF);
+		
+		// Enable debug output for this library
+		ch.qos.logback.classic.Logger cpLogDLogger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("se.uu.farmbio");
+		cpLogDLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+		
 		// Instantiate the factory 
 		try{
 			Utils.getFactory();
@@ -101,10 +106,11 @@ public class Predict {
 		try {
 			ACPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
 			CDKMutexLock.releaseLock();
+			logger.debug("Successfully finished predicting smiles="+smiles+", interval=" + res.getInterval() + ", conf=" + confidence);
 			return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence));
 		} catch (IllegalAccessException | CDKException e) {
-			logger.debug("Failed predicting smiles=" + smiles, e);
 			CDKMutexLock.releaseLock();
+			logger.debug("Failed predicting smiles=" + smiles, e);
 			return ResponseFactory.errorResponse(500, "Server error predicting");
 		}
 	}
@@ -139,7 +145,7 @@ public class Predict {
 
 		// Spawn a new thread to do the work - send a Task back as 'task accepted'
 		// Get the task ID from backend
-		int taskID = 42; // TODO
+		String taskID = "42"; // TODO
 		new Thread(new PredictRunnable(predictURI, confidence, taskID)).start();
 		logger.debug("Worker thread spawn, sending Task accepted back to caller");
 		
@@ -178,7 +184,7 @@ public class Predict {
 
 		// Spawn a new thread to do the work - send a Task back as 'task accepted'
 		// Get the task ID from backend
-		int taskID = 42; // TODO
+		String taskID = "42"; // TODO
 		new Thread(new PredictRunnable(tmpPredictFile, confidence, taskID)).start();
 		
 		// Send back the URI needed for query the task
