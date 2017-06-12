@@ -43,7 +43,6 @@
 					<stopKey>stopit</stopKey>
 					<stopWait>10</stopWait>
 					<httpConnector>
-						<port>8080</port>
 						<idleTimeout>60000</idleTimeout>
 					</httpConnector>
 				</configuration>
@@ -170,6 +169,10 @@
 
 	</dependencies>
 	<repositories>
+		<repository>
+			<id>cpsign.internal.local</id>
+			<url>file:${basedir}/repository</url>
+		</repository>
 		<repository>
 			<id>sonatype-snapshots</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>

@@ -1,22 +1,6 @@
 How to Dockerise the service
 ============================
 
-Install cpsign - jar into maven
-----------------------------------------
-cd to the /lib folder and run the following (update after current cpsign-version)
-mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file  -Dfile=cpsign-0.5.6-internal.jar \
-                                                                              -DgroupId=com.genettasoft \
-                                                                              -DartifactId=cpsign.internal \
-                                                                              -Dversion=0.5.6 \
-                                                                              -Dpackaging=jar \
-                                                                              -DgeneratePom=true
-
-If you have an old cpsign-jar installed already, you will probably need to remove it from the
-local maven repository, run:
-mvn dependency:purge-local-repository
-
-and then run the above install-call (update project once done).
-
 Check everything is working
 ---------------------------
 From the base-directory, run the following maven command
