@@ -38,14 +38,22 @@ public class Predict {
 	}
 
 	static {
+		
+		
 		// Get the root logger for cpsign
-		ch.qos.logback.classic.Logger cpsignRoot = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("com.genettasoft.modeling");
-		// Disable all cpsign-output
-		cpsignRoot.setLevel(ch.qos.logback.classic.Level.OFF);
+		Logger cpsingLogger =  org.slf4j.LoggerFactory.getLogger("com.genettasoft.modeling");
+		if(cpsingLogger instanceof ch.qos.logback.classic.Logger) {
+			ch.qos.logback.classic.Logger cpsignRoot = (ch.qos.logback.classic.Logger) cpsingLogger;
+			// Disable all cpsign-output
+			cpsignRoot.setLevel(ch.qos.logback.classic.Level.OFF);
+		}
 		
 		// Enable debug output for this library
-		ch.qos.logback.classic.Logger cpLogDLogger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("se.uu.farmbio");
-		cpLogDLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+		Logger cpLogDLogging = org.slf4j.LoggerFactory.getLogger("se.uu.farmbio");
+		if(cpLogDLogging instanceof ch.qos.logback.classic.Logger) {
+			ch.qos.logback.classic.Logger cpLogDLogger = (ch.qos.logback.classic.Logger) cpLogDLogging;
+			cpLogDLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+		}
 		
 		// Instantiate the factory 
 		try{
