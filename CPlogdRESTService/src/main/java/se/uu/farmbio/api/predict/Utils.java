@@ -4,11 +4,12 @@ import com.genettasoft.modeling.CPSignFactory;
 
 public class Utils {
 	
+	private static final String LICENSE_FILE = "cpsign0.5-predict.license";
+	
 	public static CPSignFactory getFactory() throws IllegalArgumentException {
 		try{
-			System.out.println(Utils.class.getClassLoader().getResource("*.license"));
 			
-			CPSignFactory factory = new CPSignFactory(Utils.class.getClassLoader().getResourceAsStream("cpsign0.5-standard.license"));
+			CPSignFactory factory = new CPSignFactory(Utils.class.getClassLoader().getResourceAsStream(LICENSE_FILE));
 			return factory;
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("The cpsign-license is not valid, contact info@genettasoft.com to get a new Docker container with a new license");
@@ -26,4 +27,5 @@ public class Utils {
 		String changeDashes = changeColons.replaceAll("%2F", "/");
 		return changeDashes;
 	}
+	
 }

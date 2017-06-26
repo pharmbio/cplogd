@@ -39,7 +39,6 @@ public class Predict {
 
 	static {
 		
-		
 		// Get the root logger for cpsign
 		Logger cpsingLogger =  org.slf4j.LoggerFactory.getLogger("com.genettasoft.modeling");
 		if(cpsingLogger instanceof ch.qos.logback.classic.Logger) {
