@@ -1,5 +1,6 @@
 package se.uu.farmbio.api;
 
+/*
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -56,3 +57,4 @@ public class TasksApi  {
 		return delegate.tasksIdGet(id,securityContext);
 	}
 }
+*/

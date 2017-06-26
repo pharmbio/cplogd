@@ -1,7 +1,5 @@
 package se.uu.farmbio.api;
 
-import java.io.InputStream;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -12,9 +10,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import io.swagger.annotations.ApiParam;
 import se.uu.farmbio.api.factories.LogdApiServiceFactory;
@@ -49,48 +44,48 @@ public class LogdApi  {
 
 	// POST THAT TAKES ONLY A URI
 	
-	@POST
-	@Consumes({ "multipart/form-data" })
-	@Produces({ "application/json" })
-	@io.swagger.annotations.ApiOperation(value = "Predict the result from a complete file, either in SDF or SMILES (one SMILES per line)", 
-		notes = "<b>Upload of local datafile</b></br>Predict the result from a complete file, either in SDF or SMILES (one SMILES per line). The file will be predicted and new properties will be added to the properties already present in the file. The result from this endpoint is the URI of a <b>Task</b> that should be queried for when the  prediction has finished.", 
-		response = void.class, tags={ "Predict", })
-	@io.swagger.annotations.ApiResponses(value = { 
-			@io.swagger.annotations.ApiResponse(code = 202, message = "Prediction accepted by server - redirect to prediction task to query", response = void.class),
-
-			@io.swagger.annotations.ApiResponse(code = 400, message = "Bad request (missing dataset)", response = BadRequestError.class),
-
-			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
-	public Response logdPost(@ApiParam(value = "A dataset to be predicted", required=true) @QueryParam("uri") String uri
-			,@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @DefaultValue("0.8") @QueryParam("confidence") Double confidence
-			,@Context SecurityContext securityContext)
-					throws NotFoundException {
-		return delegate.logdPostURI(uri,confidence,securityContext);
-	}
+//	@POST
+//	@Consumes({ "multipart/form-data" })
+//	@Produces({ "application/json" })
+//	@io.swagger.annotations.ApiOperation(value = "Predict the result from a complete file, either in SDF or SMILES (one SMILES per line)", 
+//		notes = "<b>Upload of local datafile</b></br>Predict the result from a complete file, either in SDF or SMILES (one SMILES per line). The file will be predicted and new properties will be added to the properties already present in the file. The result from this endpoint is the URI of a <b>Task</b> that should be queried for when the  prediction has finished.", 
+//		response = void.class, tags={ "Predict", })
+//	@io.swagger.annotations.ApiResponses(value = { 
+//			@io.swagger.annotations.ApiResponse(code = 202, message = "Prediction accepted by server - redirect to prediction task to query", response = void.class),
+//
+//			@io.swagger.annotations.ApiResponse(code = 400, message = "Bad request (missing dataset)", response = BadRequestError.class),
+//
+//			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
+//	public Response logdPost(@ApiParam(value = "A dataset to be predicted", required=true) @QueryParam("uri") String uri
+//			,@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @DefaultValue("0.8") @QueryParam("confidence") Double confidence
+//			,@Context SecurityContext securityContext)
+//					throws NotFoundException {
+//		return delegate.logdPostURI(uri,confidence,securityContext);
+//	}
 	
 	// POST THAT REQUIRES UPLOADING A FILE
 	
-	@POST
-	@Path("/upload")
-	@Consumes({ "multipart/form-data" })
-	@Produces({ "application/json" })
-	@io.swagger.annotations.ApiOperation(value = "Predict the result from a complete file, either in SDF or SMILES (one SMILES per line)", 
-		notes = "<b>publically accessible URI</b></br>Predict the result from a complete file, either in SDF or SMILES (one SMILES per line). The file will be predicted and new properties will be added to the properties already present in the file. The result from this endpoint is the URI of a <b>Task</b> that should be queried for when the  prediction has finished.", 
-		response = void.class, tags={ "Predict", })
-	@io.swagger.annotations.ApiResponses(value = { 
-			@io.swagger.annotations.ApiResponse(code = 202, message = "Prediction accepted by server - redirect to prediction task to query", response = void.class),
-
-			@io.swagger.annotations.ApiResponse(code = 400, message = "Bad request (missing dataset)", response = BadRequestError.class),
-
-			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
-	public Response logdPostUpload(
-			@FormDataParam("dataFile") InputStream dataFileInputStream,
-			@FormDataParam("dataFile") FormDataContentDisposition dataFileDetail
-			,@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @DefaultValue("0.8") @QueryParam("confidence") Double confidence
-			,@Context SecurityContext securityContext)
-					throws NotFoundException {
-		return delegate.logdPostFile(dataFileInputStream, dataFileDetail,confidence,securityContext);
-	}
+//	@POST
+//	@Path("/upload")
+//	@Consumes({ "multipart/form-data" })
+//	@Produces({ "application/json" })
+//	@io.swagger.annotations.ApiOperation(value = "Predict the result from a complete file, either in SDF or SMILES (one SMILES per line)", 
+//		notes = "<b>publically accessible URI</b></br>Predict the result from a complete file, either in SDF or SMILES (one SMILES per line). The file will be predicted and new properties will be added to the properties already present in the file. The result from this endpoint is the URI of a <b>Task</b> that should be queried for when the  prediction has finished.", 
+//		response = void.class, tags={ "Predict", })
+//	@io.swagger.annotations.ApiResponses(value = { 
+//			@io.swagger.annotations.ApiResponse(code = 202, message = "Prediction accepted by server - redirect to prediction task to query", response = void.class),
+//
+//			@io.swagger.annotations.ApiResponse(code = 400, message = "Bad request (missing dataset)", response = BadRequestError.class),
+//
+//			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
+//	public Response logdPostUpload(
+//			@FormDataParam("dataFile") InputStream dataFileInputStream,
+//			@FormDataParam("dataFile") FormDataContentDisposition dataFileDetail
+//			,@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @DefaultValue("0.8") @QueryParam("confidence") Double confidence
+//			,@Context SecurityContext securityContext)
+//					throws NotFoundException {
+//		return delegate.logdPostFile(dataFileInputStream, dataFileDetail,confidence,securityContext);
+//	}
 }
 
 
