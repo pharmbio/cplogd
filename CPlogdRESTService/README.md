@@ -35,6 +35,7 @@ service port 8080.
 ``` 
 FROM jetty:9.2-jre7
 ADD *.war /var/lib/jetty/webapps/root.war
+COPY dist/ /var/lib/jetty/webapps/api
 EXPOSE 8080
 ``` 
 
@@ -43,13 +44,18 @@ EXPOSE 8080
 First you need to add the `.war`-file to the Docker-folder, as we do not want
 to have to mount any extra directories to the Docker-image.
 If you're standing in your Docker-folder run the following command to get
-a docker-image with the name cpsign:
+a docker-image with the name cplogd:
 ``` 
-docker build -t cpsign .
+docker build -t cplogd .
 ```
 
 use the default web-port (80) and forward to the port jetty listens to (8080):
 ```
-docker run -it -p 80:8080 cpsign-rest
+docker run -it -p 80:8080 cplogd
 ```
 (the `-it` makes print information, remove when in production-mode)
+
+### Automation
+
+Simply run `build.sh` to use maven to build the WAR, copy it and the Dist-folder (serving Swagger UI) into the Docker directory 
+and use docker to build and compress the docker image. 
