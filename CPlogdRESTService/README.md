@@ -21,3 +21,35 @@ http://localhost:8080/v1/swagger.json
 
 Note that if you have configured the `host` to be something other than localhost, the calls through
 swagger-ui will be directed to that host and not localhost!
+
+## Dockerfile
+
+Dockerfile is located in directory "Docker"
+The Dockerfile should start with the base jetty-image, Swagger used
+jetty version 9.2 so we should do that as well. We also use Java7 so 
+the jre7 is the required java-version of the image. 
+We simply need to add our WAR-file to the jetty root and expose the 
+service port 8080. 
+
+### Dockerfile
+``` 
+FROM jetty:9.2-jre7
+ADD *.war /var/lib/jetty/webapps/root.war
+EXPOSE 8080
+``` 
+
+### Using docker to create image and run
+
+First you need to add the `.war`-file to the Docker-folder, as we do not want
+to have to mount any extra directories to the Docker-image.
+If you're standing in your Docker-folder run the following command to get
+a docker-image with the name cpsign:
+``` 
+docker build -t cpsign .
+```
+
+use the default web-port (80) and forward to the port jetty listens to (8080):
+```
+docker run -it -p 80:8080 cpsign-rest
+```
+(the `-it` makes print information, remove when in production-mode)
