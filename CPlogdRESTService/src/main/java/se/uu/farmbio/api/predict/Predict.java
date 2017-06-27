@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.genettasoft.modeling.CPSignFactory;
 import com.genettasoft.modeling.acp.ACPRegressionResult;
+import com.genettasoft.modeling.acp.IACPRegression;
 import com.genettasoft.modeling.cheminf.SignaturesACPRegression;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
 
@@ -28,7 +29,8 @@ import se.uu.farmbio.models.Prediction;
 public class Predict {
 
 	private static final Logger logger = LoggerFactory.getLogger(Predict.class);
-	private static final String MODEL = "acp.regression.test.cpsign";
+	private static final String MODEL_SPLIT_1 = "Chembl23_next_to_final_model.1.cpsign";
+	private static final String MODEL_SPLIT_2 = "Chembl23_next_to_final_model.2.cpsign";
 
 	private static Response serverErrorResponse = null;
 	private static SignaturesACPRegression signaturesACPReg = null;
@@ -66,10 +68,14 @@ public class Predict {
 		if (serverErrorResponse == null) {
 			try {
 				logger.debug("Trying to load in the model");
-				URI modelURI = Predict.class.getClassLoader().getResource(MODEL).toURI();
-				if(modelURI == null)
+				URI modelURI_1 = Predict.class.getClassLoader().getResource(MODEL_SPLIT_1).toURI();
+				URI modelURI_2 = Predict.class.getClassLoader().getResource(MODEL_SPLIT_2).toURI();
+				if(modelURI_1 == null || modelURI_2 == null)
 					throw new IOException("did not locate the model file");
-				signaturesACPReg = (SignaturesACPRegression) BNDLoader.loadModel(modelURI, null);
+				signaturesACPReg = (SignaturesACPRegression) BNDLoader.loadModel(modelURI_1, null);
+				logger.info("Loaded first split of model");
+				signaturesACPReg.addModel(modelURI_2, null);
+				logger.info("Loaded second split of model");
 				logger.info("Finished initializing the server with the loaded model");
 			} catch (IllegalAccessException | IOException | URISyntaxException e) {
 				logger.error("Could not load the model", e);
