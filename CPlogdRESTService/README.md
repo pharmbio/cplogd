@@ -57,5 +57,26 @@ docker run -it -p 80:8080 cplogd
 
 ### Automation
 
-Simply run `build.sh` to use maven to build the WAR, copy it and the Dist-folder (serving Swagger UI) into the Docker directory 
+Simply run: 
+```
+build.sh
+```
+to use maven to build the WAR, copy it and the Dist-folder (serving Swagger UI) into the Docker directory 
 and use docker to build and compress the docker image. 
+
+#### Try it out
+If everything is working properly, jetty will be listening on the default web port (80), it should serve the Swagger UI on:
+```
+localhost/api
+```
+
+Swagger should be accessible at:
+```
+localhost/v1/swagger.json
+localhost/v1/swagger.yaml
+```
+
+Running predictions at:
+```
+localhost/v1/logd?smiles=CC(%3DO)OCC%5BN%2B%5D(C)(C)C&confidence=0.8
+```

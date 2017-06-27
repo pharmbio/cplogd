@@ -1,16 +1,22 @@
 package se.uu.farmbio.api;
 
-import io.swagger.jaxrs.config.SwaggerContextService;
-import io.swagger.models.*;
-
-import io.swagger.models.auth.*;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+
+import io.swagger.jaxrs.config.SwaggerContextService;
+import io.swagger.models.Contact;
+import io.swagger.models.ExternalDocs;
+import io.swagger.models.Info;
+import io.swagger.models.Scheme;
+import io.swagger.models.Swagger;
 
 public class Bootstrap extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -439284950848469873L;
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		Info info = new Info()
@@ -24,8 +30,14 @@ public class Bootstrap extends HttpServlet {
 				//        .url("http://unlicense.org"))
 				;
 
-		ServletContext context = config.getServletContext();
-		Swagger swagger = new Swagger().info(info);
+		Swagger swagger = new Swagger()
+	    		.info(info)
+	    		.basePath("/v1")
+	    		.host("localhost")
+	    		.scheme(Scheme.HTTP)
+	    		.produces("application/json")
+	    		.externalDocs(new ExternalDocs("More information", "http://cpsign-docs.genettasoft.com/"))
+	    		;
 
 		new SwaggerContextService().withServletConfig(config).updateSwagger(swagger);
 	}
