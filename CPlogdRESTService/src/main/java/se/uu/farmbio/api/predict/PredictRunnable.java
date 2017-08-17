@@ -126,7 +126,7 @@ public class PredictRunnable implements Runnable {
 			CDKMutexLock.releaseLock();
 
 			// Successfully end - update backend with data and then remove the temporary file TODO
-			logger.info("Thread for task '" + TASK_ID + "' successfully finished prediction of file/uri with " + numSuccess + " molecules");
+			logger.debug("Thread for task '" + TASK_ID + "' successfully finished prediction of file/uri with " + numSuccess + " molecules");
 
 		} catch (ExitThreadExecution e) {
 			// Backend have been updated, time for thread to die
@@ -154,7 +154,7 @@ public class PredictRunnable implements Runnable {
 		throw new ExitThreadExecution();
 	}
 
-	public class ExitThreadExecution extends RuntimeException{
+	public class ExitThreadExecution extends RuntimeException {
 
 		/**
 		 * 
