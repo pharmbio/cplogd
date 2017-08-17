@@ -40,10 +40,10 @@ public class Prediction   {
 
 	@JsonProperty("predictionMidpoint")
 	private Double predictionMidpoint = null;
-	
+
 	@JsonProperty("confidence")
 	private Double confidence = null;
-	
+
 	public Prediction(String smiles, double lower, double upper, double mp, double confidence) {
 		this.smiles = smiles;
 		this.lower = lower;
@@ -91,7 +91,7 @@ public class Prediction   {
 	public Double getPredictionMidpoint() {
 		return predictionMidpoint;
 	}
-	
+
 	/**
 	 * The confidence of the prediction 
 	 * @return confidence
@@ -135,6 +135,6 @@ public class Prediction   {
 		resp.put("confidence", confidence);
 		return resp.toJSONString();
 	}
-	
+
 }
 

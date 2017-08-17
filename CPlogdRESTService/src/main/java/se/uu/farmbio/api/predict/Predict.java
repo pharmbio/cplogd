@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import com.genettasoft.modeling.CPSignFactory;
 import com.genettasoft.modeling.acp.ACPRegressionResult;
-import com.genettasoft.modeling.acp.IACPRegression;
 import com.genettasoft.modeling.cheminf.SignaturesACPRegression;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
 
@@ -96,7 +95,7 @@ public class Predict {
 	 */
 
 	public static Response doSinglePredict(String smiles, double confidence) {
-		logger.info("got a prediction task, smiles="+smiles + " , conf=" + confidence);
+		logger.debug("got a prediction task, smiles="+smiles + " , conf=" + confidence);
 		
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
@@ -111,7 +110,7 @@ public class Predict {
 		try{
 			molToPredict = CPSignFactory.parseSMILES(smiles);
 		} catch(IllegalArgumentException e){
-			logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping");
+			logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
 			CDKMutexLock.releaseLock();
 			return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", Arrays.asList("smiles"));
 		}
@@ -133,7 +132,7 @@ public class Predict {
 	/*
 	 * =====================================================================================================================
 	 * 
-	 * 									MULTIPLE PREDICTIONS
+	 * 									MULTIPLE PREDICTIONS (CURRENTLY NOT AVAILIABLE)
 	 * 
 	 * =====================================================================================================================
 	 */

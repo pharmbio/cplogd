@@ -73,11 +73,11 @@ public class BadRequestError extends Error  {
 		jsonResponse.put("code", getCode());
 		jsonResponse.put("message", getMessage());
 		jsonResponse.put("fields", fields);
-		
+
 		return jsonResponse.toJSONString();
 	}
-	
 
-	
+
+
 }
 

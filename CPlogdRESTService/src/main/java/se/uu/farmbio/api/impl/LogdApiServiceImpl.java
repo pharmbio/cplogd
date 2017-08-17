@@ -47,7 +47,7 @@ public class LogdApiServiceImpl extends LogdApiService {
 //
 //	}
 
-	@Override
+//	@Override
 	public Response logdPostURI(String uri, Double confidence, SecurityContext securityContext)
 			throws NotFoundException {
 		uri = Utils.cleanURI(uri);
@@ -60,7 +60,7 @@ public class LogdApiServiceImpl extends LogdApiService {
 		return Predict.doUriPredict(checkedURI, confidence);
 	}
 
-	@Override
+//	@Override
 	public Response logdPostFile(InputStream dataFileInputStream, FormDataContentDisposition dataFileDetail,
 			Double confidence, SecurityContext securityContext) throws NotFoundException {
 		return Predict.doFilePredict(dataFileInputStream, confidence);
