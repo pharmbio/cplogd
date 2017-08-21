@@ -33,7 +33,11 @@ public class Bootstrap extends HttpServlet {
 				.description("This is a Conformal Prediction Service for predicting Log D values for compounds. The  underlying model has been trained and evaluated on ChEMBL 23 data. Modeling is done using CPSign, product of GenettaSoft AB.")
 				.termsOfService("")
 				.contact(new Contact()
-						.email("info@genettasoft.com"))
+						.name("Maris Lapins")
+						.email("maris.lapins@farmbio.uu.se")
+//						.email("info@genettasoft.com")
+						.url("https://pharmb.io/")
+						)
 				//      .license(new License()
 				//        .name("")
 				//        .url("http://unlicense.org"))
@@ -45,7 +49,7 @@ public class Bootstrap extends HttpServlet {
 	    		.host(getHostURL())
 	    		.scheme(Scheme.HTTP)
 	    		.produces("application/json")
-	    		.externalDocs(new ExternalDocs("More information", "http://cpsign-docs.genettasoft.com/"))
+	    		.externalDocs(new ExternalDocs("Pharmb.io", "https://pharmb.io/"))
 	    		;
 
 		new SwaggerContextService().withServletConfig(config).updateSwagger(swagger);
