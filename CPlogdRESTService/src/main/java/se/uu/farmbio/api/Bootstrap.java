@@ -5,7 +5,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import io.swagger.jaxrs.config.SwaggerContextService;
-import io.swagger.models.Contact;
 import io.swagger.models.ExternalDocs;
 import io.swagger.models.Info;
 import io.swagger.models.Scheme;
@@ -29,15 +28,15 @@ public class Bootstrap extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		Info info = new Info()
-				.title("Swagger Server")
+				.title("CP Log D")
 				.description("This is a Conformal Prediction Service for predicting Log D values for compounds. The  underlying model has been trained and evaluated on ChEMBL 23 data. Modeling is done using CPSign, product of GenettaSoft AB.")
 				.termsOfService("")
-				.contact(new Contact()
-						.name("Maris Lapins")
-						.email("maris.lapins@farmbio.uu.se")
-//						.email("info@genettasoft.com")
-						.url("https://pharmb.io/")
-						)
+//				.contact(new Contact()
+//						.name("Maris Lapins")
+//						.email("maris.lapins@farmbio.uu.se")
+////						.email("info@genettasoft.com")
+//						.url("https://pharmb.io/")
+//						)
 				//      .license(new License()
 				//        .name("")
 				//        .url("http://unlicense.org"))
