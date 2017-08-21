@@ -22,6 +22,13 @@ http://localhost:8080/v1/swagger.json
 Note that if you have configured the `host` to be something other than localhost, the calls through
 swagger-ui will be directed to that host and not localhost!
 
+## Environment variable
+
+Please pass the environment variable `HOST_URL` that will be used to build the complete path for each endpoint and 
+is pieced together as: "http://[HOST_URL]/[base_path]/endpoint" where [base_path] is set in the swagger and web.xml
+to `/v1`
+
+
 ## Dockerfile
 
 Dockerfile is located in directory "Docker"
