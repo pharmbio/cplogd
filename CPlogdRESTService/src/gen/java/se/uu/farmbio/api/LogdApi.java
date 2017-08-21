@@ -34,7 +34,7 @@ public class LogdApi  {
 			@io.swagger.annotations.ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
 
 			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
-	public Response logdGet(@ApiParam(value = "Compound structure notation using SMILES notation",required=true) @QueryParam("smiles") String smiles
+	public Response logdGet(@ApiParam(value = "Compound structure notation using SMILES notation", example="c1ccccc1", required=true) @QueryParam("smiles") String smiles
 			,@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @DefaultValue("0.8") @QueryParam("confidence") Double confidence
 			,@Context SecurityContext securityContext)
 					throws NotFoundException {

@@ -73,7 +73,7 @@
 window.onload = function() {
   // Build a system
   const ui = SwaggerUIBundle({
-    url: "http://logd.services.pharmb.io/v1/swagger.json",
+    url: "http://cplogd.services.pharmb.io/v1/swagger.json",
     dom_id: '#swagger-ui',
     presets: [
       SwaggerUIBundle.presets.apis,
@@ -82,7 +82,8 @@ window.onload = function() {
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl
     ],
-    layout: "StandaloneLayout"
+    layout: "StandaloneLayout",
+    docExpansion: 'full'
   })
 
   window.ui = ui

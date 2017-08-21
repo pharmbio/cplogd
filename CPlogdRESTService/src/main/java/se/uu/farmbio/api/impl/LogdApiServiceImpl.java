@@ -22,6 +22,8 @@ public class LogdApiServiceImpl extends LogdApiService {
 	
 	@Override
 	public Response logdGet( @NotNull String smiles,  @Min(0) @Max(1) Double confidence, SecurityContext securityContext) throws NotFoundException {
+		if(confidence == null)
+			return ResponseFactory.badRequestResponse(400, "missing argument", "confidence");
 		return Predict.doSinglePredict(smiles, confidence);
 	}
 	
@@ -48,7 +50,7 @@ public class LogdApiServiceImpl extends LogdApiService {
 //	}
 
 //	@Override
-	public Response logdPostURI(String uri, Double confidence, SecurityContext securityContext)
+	public Response logdPostURI(String uri, @Min(0) @Max(1) Double confidence, SecurityContext securityContext)
 			throws NotFoundException {
 		uri = Utils.cleanURI(uri);
 		URI checkedURI = null;
@@ -62,7 +64,7 @@ public class LogdApiServiceImpl extends LogdApiService {
 
 //	@Override
 	public Response logdPostFile(InputStream dataFileInputStream, FormDataContentDisposition dataFileDetail,
-			Double confidence, SecurityContext securityContext) throws NotFoundException {
+			@Min(0) @Max(1) Double confidence, SecurityContext securityContext) throws NotFoundException {
 		return Predict.doFilePredict(dataFileInputStream, confidence);
 	}
 }

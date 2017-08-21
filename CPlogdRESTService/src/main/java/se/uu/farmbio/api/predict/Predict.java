@@ -100,6 +100,12 @@ public class Predict {
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
 		
+		if(confidence < 0 || confidence > 1){
+			logger.debug("invalid argument confidence=" + confidence);
+			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
+		}
+			
+		
 		if (smiles==null || smiles.isEmpty()){
 			logger.debug("Missing arguments 'smiles'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("smiles"));
