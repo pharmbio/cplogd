@@ -78,5 +78,5 @@ localhost/v1/swagger.yaml
 
 Running predictions at:
 ```
-localhost/v1/logd?smiles=CC(%3DO)OCC%5BN%2B%5D(C)(C)C&confidence=0.8
+localhost/v1/prediction?smiles=CC(%3DO)OCC%5BN%2B%5D(C)(C)C&confidence=0.8
 ```

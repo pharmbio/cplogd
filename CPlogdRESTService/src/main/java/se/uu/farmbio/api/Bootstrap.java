@@ -16,6 +16,15 @@ public class Bootstrap extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = -439284950848469873L;
+	private static final String HOST_URL_ENV_VARIABLE = "HOST_URL";
+	
+	public static String getHostURL(){
+		try{
+			return System.getenv(HOST_URL_ENV_VARIABLE);
+		} catch(Exception e){
+			return "localhost";
+		}
+	}
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -33,7 +42,7 @@ public class Bootstrap extends HttpServlet {
 		Swagger swagger = new Swagger()
 	    		.info(info)
 	    		.basePath("/v1")
-	    		.host("localhost")
+	    		.host(getHostURL())
 	    		.scheme(Scheme.HTTP)
 	    		.produces("application/json")
 	    		.externalDocs(new ExternalDocs("More information", "http://cpsign-docs.genettasoft.com/"))

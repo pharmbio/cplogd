@@ -16,7 +16,7 @@ import se.uu.farmbio.models.BadRequestError;
 import se.uu.farmbio.models.Error;
 import se.uu.farmbio.models.Prediction;
 
-@Path("/logd")
+@Path("/prediction")
 @Consumes({ "multipart/form-data" })
 @Produces({ "application/json" })
 @io.swagger.annotations.Api(description = "the logd API")
