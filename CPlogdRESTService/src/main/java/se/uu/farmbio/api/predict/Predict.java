@@ -1,6 +1,9 @@
 package se.uu.farmbio.api.predict;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,6 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
+import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
@@ -17,10 +21,13 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.genettasoft.depict.GradientFactory;
 import com.genettasoft.modeling.CPSignFactory;
+import com.genettasoft.modeling.SignificantSignature;
 import com.genettasoft.modeling.acp.ACPRegressionResult;
 import com.genettasoft.modeling.cheminf.SignaturesACPRegression;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
+import com.genettasoft.modeling.io.chemwriter.MolImageDepictor;
 
 import se.uu.farmbio.api.responses.ResponseFactory;
 import se.uu.farmbio.models.Prediction;
@@ -39,7 +46,7 @@ public class Predict {
 	}
 
 	static {
-		
+
 		// Get the root logger for cpsign
 		Logger cpsingLogger =  org.slf4j.LoggerFactory.getLogger("com.genettasoft.modeling");
 		if(cpsingLogger instanceof ch.qos.logback.classic.Logger) {
@@ -47,14 +54,14 @@ public class Predict {
 			// Disable all cpsign-output
 			cpsignRoot.setLevel(ch.qos.logback.classic.Level.OFF);
 		}
-		
+
 		// Enable debug output for this library
 		Logger cpLogDLogging = org.slf4j.LoggerFactory.getLogger("se.uu.farmbio");
 		if(cpLogDLogging instanceof ch.qos.logback.classic.Logger) {
 			ch.qos.logback.classic.Logger cpLogDLogger = (ch.qos.logback.classic.Logger) cpLogDLogging;
 			cpLogDLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
 		}
-		
+
 		// Instantiate the factory 
 		try{
 			Utils.getFactory();
@@ -83,7 +90,7 @@ public class Predict {
 		}
 
 	}
-	
+
 
 
 	/*
@@ -96,16 +103,15 @@ public class Predict {
 
 	public static Response doSinglePredict(String smiles, double confidence) {
 		logger.debug("got a prediction task, smiles="+smiles + " , conf=" + confidence);
-		
+
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
-		
+
 		if(confidence < 0 || confidence > 1){
 			logger.debug("invalid argument confidence=" + confidence);
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
-			
-		
+
 		if (smiles==null || smiles.isEmpty()){
 			logger.debug("Missing arguments 'smiles'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("smiles"));
@@ -114,24 +120,71 @@ public class Predict {
 		IAtomContainer molToPredict=null;
 		CDKMutexLock.requireLock();
 		try{
-			molToPredict = CPSignFactory.parseSMILES(smiles);
-		} catch(IllegalArgumentException e){
-			logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
+			// Parse the SMILES
+			try{
+				molToPredict = CPSignFactory.parseSMILES(smiles);
+			} catch(IllegalArgumentException e){
+				logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
+				return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", Arrays.asList("smiles"));
+			}
+			// Do prediction
+			try {
+				ACPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
+				logger.debug("Successfully finished predicting smiles="+smiles+", interval=" + res.getInterval() + ", conf=" + confidence);
+				return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence));
+			} catch (IllegalAccessException | CDKException e) {
+				logger.debug("Failed predicting smiles=" + smiles, e);
+				return ResponseFactory.errorResponse(500, "Server error predicting");
+			}
+		} finally {
 			CDKMutexLock.releaseLock();
-			return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", Arrays.asList("smiles"));
-		}
-
-		try {
-			ACPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
-			CDKMutexLock.releaseLock();
-			logger.debug("Successfully finished predicting smiles="+smiles+", interval=" + res.getInterval() + ", conf=" + confidence);
-			return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence));
-		} catch (IllegalAccessException | CDKException e) {
-			CDKMutexLock.releaseLock();
-			logger.debug("Failed predicting smiles=" + smiles, e);
-			return ResponseFactory.errorResponse(500, "Server error predicting");
 		}
 	}
+
+	public static Response doImagePredict(String smiles) {
+		logger.debug("got a predict-image task, smiles="+smiles);
+
+		if(serverErrorResponse != null)
+			return serverErrorResponse;
+		IAtomContainer molToPredict=null;
+		CDKMutexLock.requireLock();
+		try {
+			// Parse SMILES
+			try{
+				molToPredict = CPSignFactory.parseSMILES(smiles);
+			} catch(IllegalArgumentException e){
+				logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
+				return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", "smiles");
+			}
+
+			// CALCULATE GRADIENT & GENERATE IMAGE
+			SignificantSignature signSign = null;
+
+			try {
+				signSign = signaturesACPReg.predictSignificantSignature(molToPredict);
+				MolImageDepictor depictor = MolImageDepictor.getGradientDepictor(GradientFactory.getDefaultBloomGradient());
+				//			 MoleculeDepictor depictor = MoleculeDepictor.getBloomDepictor();
+				depictor.setDepictLegend(true);
+
+				BufferedImage image = depictor.depictMolecule(molToPredict, signSign.getAtomValues());
+				//			 BufferedImage image = depictor.depict(molToPredict, signSign.getAtomValues())
+
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ImageIO.write(image, "png", baos);
+				byte[] imageData = baos.toByteArray();
+
+				return Response.ok( new ByteArrayInputStream(imageData) ).build();
+			}
+			catch (IllegalAccessException | CDKException | IOException e) {
+				logger.debug("Failed predicting smiles=" + smiles, e);
+				return ResponseFactory.errorResponse(500, "Server error");
+			}
+		}
+		finally {
+			CDKMutexLock.releaseLock();
+		}
+	}
+
 
 
 
@@ -156,7 +209,7 @@ public class Predict {
 			logger.debug("Missing arguments 'predictURI'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("uri"));
 		}
-		
+
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
 
@@ -166,7 +219,7 @@ public class Predict {
 		String taskID = "42"; // TODO
 		new Thread(new PredictRunnable(predictURI, confidence, taskID)).start();
 		logger.debug("Worker thread spawn, sending Task accepted back to caller");
-		
+
 		// Send back the URI needed for query the task
 		return ResponseFactory.taskAccepted("/tasks/" + taskID);
 	}
@@ -185,7 +238,7 @@ public class Predict {
 			logger.debug("Missing arguments 'fileInputStream'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("dataFile"));
 		}
-		
+
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
 
@@ -204,7 +257,7 @@ public class Predict {
 		// Get the task ID from backend
 		String taskID = "42"; // TODO
 		new Thread(new PredictRunnable(tmpPredictFile, confidence, taskID)).start();
-		
+
 		// Send back the URI needed for query the task
 		return ResponseFactory.taskAccepted("/tasks/" + taskID);
 	}

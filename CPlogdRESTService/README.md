@@ -7,7 +7,7 @@ is an example of building a swagger-enabled JAX-RS server.
 
 This example uses the [JAX-RS](https://jax-rs-spec.java.net/) framework.
 
-To run the server, please execute the following:
+To run the server, execute the following:
 
 ```
 mvn clean package jetty:run
