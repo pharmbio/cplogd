@@ -7,7 +7,7 @@
 	<name>CP Log D</name>
 	<version>0.0.1</version>
 
-	<!-- <licenses> <license> <name>Unlicense</name> <url>http://unlicense.org</url>
+	<!-- <licenses> <license> <name>Unlicense</name> <url>http://unlicense.org</url> 
 		<distribution>repo</distribution> </license> </licenses> -->
 	<profiles>
 		<profile>
@@ -18,9 +18,9 @@
 			<build>
 				<plugins>
 					<plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>3.1.0</version>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<version>3.1.0</version>
 					</plugin>
 				</plugins>
 			</build>
@@ -31,87 +31,90 @@
 				<plugins>
 
 					<plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
-                <artifactId>download-maven-plugin</artifactId>
-							  <version>1.3.0</version>
-                <executions>
-                    <execution>
-                        <id>download-swagger-ui</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>wget</goal>
-                        </goals>
-                        <configuration>
-                            <url>${swagger.url}/v${swagger.ui.version}.zip</url>
-                            <md5>${swagger.md5}</md5>
-                            <unpack>true</unpack>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-						<plugin>
-							 <groupId>org.apache.maven.plugins</groupId>
-							 <artifactId>maven-antrun-plugin</artifactId>
-							 <executions>
-									 <execution>
-											 <id>change-swagger-ui-url</id>
-											 <phase>prepare-package</phase>
-											 <goals>
-													 <goal>run</goal>
-											 </goals>
-											 <configuration>
-													 <target>
-															 <replaceregexp match="http://petstore.swagger.io/v2/swagger.json" replace="http://localhost:8080/rest/api/swagger" byline="true">
-																	 <fileset dir="${project.build.directory}/swagger-ui-${swagger.ui.version}/dist">
-																			 <include name="*.html" />
-																			 <include name="*.js" />
-																	 </fileset>
-																	 <fileset dir="${project.build.directory}/swagger-ui-${swagger.ui.version}/dist/lang">
-																			 <include name="*.js" />
-																	 </fileset>
-															 </replaceregexp>
-													 </target>
-											 </configuration>
-									 </execution>
-							 </executions>
-					 </plugin>
-					 <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-								<version>3.0.2</version>
-                <executions>
-                    <execution>
-                        <id>copy-swagger-ui</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}/swagger-ui-${swagger.ui.version}/dist</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-						<plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-war-plugin</artifactId>
-              <version>3.1.0</version>
-							<configuration>
-								<warName>ROOT</warName>
-								<webResources>
-									<resource>
-										<directory>${project.build.directory}/swagger-ui-${swagger.ui.version}/dist</directory>
-										<targetPath>WEB-INF</targetPath>
-									</resource>
-								</webResources>
-							</configuration>
-						</plugin>
+						<groupId>com.googlecode.maven-download-plugin</groupId>
+						<artifactId>download-maven-plugin</artifactId>
+						<version>1.3.0</version>
+						<executions>
+							<execution>
+								<id>download-swagger-ui</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>wget</goal>
+								</goals>
+								<configuration>
+									<url>${swagger.url}/v${swagger.ui.version}.zip</url>
+									<md5>${swagger.md5}</md5>
+									<unpack>true</unpack>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>change-swagger-ui-url</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<replaceregexp match="http://petstore.swagger.io/v2/swagger.json"
+											replace="http://localhost:8080/rest/api/swagger" byline="true">
+											<fileset
+												dir="${project.build.directory}/swagger-ui-${swagger.ui.version}/dist">
+												<include name="*.html" />
+												<include name="*.js" />
+											</fileset>
+											<fileset
+												dir="${project.build.directory}/swagger-ui-${swagger.ui.version}/dist/lang">
+												<include name="*.js" />
+											</fileset>
+										</replaceregexp>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.0.2</version>
+						<executions>
+							<execution>
+								<id>copy-swagger-ui</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/${project.artifactId}</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${project.build.directory}/swagger-ui-${swagger.ui.version}/dist</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<version>3.1.0</version>
+						<configuration>
+							<warName>ROOT</warName>
+							<webResources>
+								<resource>
+									<directory>${project.build.directory}/swagger-ui-${swagger.ui.version}/dist</directory>
+									<targetPath>WEB-INF</targetPath>
+								</resource>
+							</webResources>
+						</configuration>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -259,14 +262,8 @@
 
 
 		<!-- Bean Validation API support -->
-		<!--
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
-			<scope>provided</scope>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>javax.validation</groupId> <artifactId>validation-api</artifactId> 
+			<version>1.1.0.Final</version> <scope>provided</scope> </dependency> -->
 
 	</dependencies>
 	<repositories>
@@ -283,9 +280,9 @@
 		</repository>
 	</repositories>
 	<properties>
-    <swagger.ui.version>3.4.2</swagger.ui.version>
-    <swagger.url>https://github.com/swagger-api/swagger-ui/archive</swagger.url>
-    <swagger.md5>f06fcf8f95b2ffb22718c6d367f25ace</swagger.md5>
+		<swagger.ui.version>3.4.2</swagger.ui.version>
+		<swagger.url>https://github.com/swagger-api/swagger-ui/archive</swagger.url>
+		<swagger.md5>f06fcf8f95b2ffb22718c6d367f25ace</swagger.md5>
 
 		<cpsign.version>0.5.8</cpsign.version>
 		<java.version>1.7</java.version>
