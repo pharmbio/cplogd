@@ -53,6 +53,13 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
+						<dependencies>
+							<dependency>
+								<groupId>ant</groupId>
+								<artifactId>ant-nodeps</artifactId>
+								<version>1.6.5</version>
+							</dependency>
+						</dependencies>
 						<executions>
 							<execution>
 								<id>change-swagger-ui-url</id>
@@ -61,20 +68,16 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<target>
-										<replaceregexp match="http://petstore.swagger.io/v2/swagger.json"
-											replace="http://localhost:8080/rest/api/swagger" byline="true">
+									<tasks>
+										<replaceregexp match='"http://petstore.swagger.io/v2/swagger.json"'
+											replace='window.location.origin + "/v1/swagger.json"' byline="true">
 											<fileset
 												dir="${project.build.directory}/swagger-ui-${swagger.ui.version}/dist">
 												<include name="*.html" />
 												<include name="*.js" />
 											</fileset>
-											<fileset
-												dir="${project.build.directory}/swagger-ui-${swagger.ui.version}/dist/lang">
-												<include name="*.js" />
-											</fileset>
 										</replaceregexp>
-									</target>
+									</tasks>
 								</configuration>
 							</execution>
 						</executions>
