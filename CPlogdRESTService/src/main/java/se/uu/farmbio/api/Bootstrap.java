@@ -1,5 +1,8 @@
 package se.uu.farmbio.api;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -38,10 +41,10 @@ public class Bootstrap extends HttpServlet {
 	    		.info(info)
 	    		.basePath("/v1")
 	    		.host(getHostURL())
-	    		.scheme(Scheme.HTTP)
 	    		.produces("application/json")
 	    		.externalDocs(new ExternalDocs("Pharmb.io", "https://pharmb.io/"))
 	    		;
+		swagger.setSchemes(new ArrayList<Scheme>(Arrays.asList(Scheme.HTTPS,Scheme.HTTP)));
 
 		new SwaggerContextService().withServletConfig(config).updateSwagger(swagger);
 	}
