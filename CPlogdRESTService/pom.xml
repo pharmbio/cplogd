@@ -110,7 +110,7 @@
 							<webResources>
 								<resource>
 									<directory>${project.build.directory}/swagger-ui-${swagger.ui.version}/dist</directory>
-									<targetPath>WEB-INF</targetPath>
+									<targetPath>/</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
