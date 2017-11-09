@@ -31,15 +31,7 @@ public class Bootstrap extends HttpServlet {
 				.title("CP Log D")
 				.description("This is a Conformal Prediction Service for predicting Log D values for compounds. The  underlying model has been trained and evaluated on ChEMBL 23 data. Modeling is done using CPSign, product of GenettaSoft AB.")
 				.termsOfService("")
-//				.contact(new Contact()
-//						.name("Maris Lapins")
-//						.email("maris.lapins@farmbio.uu.se")
-////						.email("info@genettasoft.com")
-//						.url("https://pharmb.io/")
-//						)
-				//      .license(new License()
-				//        .name("")
-				//        .url("http://unlicense.org"))
+				.version("0.0.1")
 				;
 
 		Swagger swagger = new Swagger()
