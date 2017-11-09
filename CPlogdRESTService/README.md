@@ -87,3 +87,11 @@ Running predictions at:
 ```
 localhost/v1/prediction?smiles=CC(%3DO)OCC%5BN%2B%5D(C)(C)C&confidence=0.8
 ```
+
+
+## Add CPSign-jar to maven local repo
+
+https://devcenter.heroku.com/articles/local-maven-dependencies
+
+cd into the lib directory, run command:
+mvn deploy:deploy-file -Durl=file:///Users/staffan/git/cplogd/CPlogdRESTService/repository/ -Dfile=cpsign-0.5.8-internal.jar -DgroupId=com.genettasoft -DartifactId=cpsign.internal -Dpackaging=jar -Dversion=0.5.8

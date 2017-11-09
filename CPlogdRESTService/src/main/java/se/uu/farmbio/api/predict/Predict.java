@@ -27,6 +27,7 @@ import com.genettasoft.modeling.SignificantSignature;
 import com.genettasoft.modeling.acp.ACPRegressionResult;
 import com.genettasoft.modeling.cheminf.SignaturesACPRegression;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
+import com.genettasoft.modeling.io.chemwriter.MolGradientDepictor;
 import com.genettasoft.modeling.io.chemwriter.MolImageDepictor;
 
 import se.uu.farmbio.api.responses.ResponseFactory;
@@ -162,11 +163,11 @@ public class Predict {
 
 			try {
 				signSign = signaturesACPReg.predictSignificantSignature(molToPredict);
-				MolImageDepictor depictor = MolImageDepictor.getGradientDepictor(GradientFactory.getDefaultBloomGradient());
+				MolImageDepictor depictor = new MolGradientDepictor(GradientFactory.getDefaultBloomGradient());
 				//			 MoleculeDepictor depictor = MoleculeDepictor.getBloomDepictor();
-				depictor.setDepictLegend(true);
+				depictor.setUseLegend(true);
 
-				BufferedImage image = depictor.depictMolecule(molToPredict, signSign.getAtomValues());
+				BufferedImage image = depictor.depictMolecule(molToPredict, signSign.getAtomValues(), null);
 				//			 BufferedImage image = depictor.depict(molToPredict, signSign.getAtomValues())
 
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
