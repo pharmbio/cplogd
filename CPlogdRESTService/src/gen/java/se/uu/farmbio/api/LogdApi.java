@@ -61,9 +61,10 @@ public class LogdApi  {
 			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdImgGet(
 			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
+			@ApiParam(value = "Image size, the rendered image will be imageSize*imageSize pixels (plus some pixels for the legend)", required=false) @DefaultValue("600") @QueryParam("imageSize") int imgSize,
 			@Context SecurityContext securityContext)
 					throws NotFoundException {
-		return delegate.logdImageGet(smiles, securityContext);
+		return delegate.logdImageGet(smiles, imgSize, securityContext);
 	}
 
 

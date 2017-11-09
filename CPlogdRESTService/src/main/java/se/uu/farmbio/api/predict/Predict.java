@@ -142,11 +142,15 @@ public class Predict {
 		}
 	}
 
-	public static Response doImagePredict(String smiles) {
-		logger.debug("got a predict-image task, smiles="+smiles);
+	public static Response doImagePredict(String smiles, int imageSize) {
+		logger.debug("got a predict-image task, smiles="+smiles +", imageSize="+imageSize);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
+		
+		if (imageSize < 400 || imageSize> 2400)
+			return ResponseFactory.badRequestResponse(400, "imageSize must be in the range [400,2400] pixels", "imageSize");
+			
 		IAtomContainer molToPredict=null;
 		CDKMutexLock.requireLock();
 		try {
@@ -166,6 +170,8 @@ public class Predict {
 				MolImageDepictor depictor = new MolGradientDepictor(GradientFactory.getDefaultBloomGradient());
 				//			 MoleculeDepictor depictor = MoleculeDepictor.getBloomDepictor();
 				depictor.setUseLegend(true);
+				depictor.setImageHeight(imageSize);
+				depictor.setImageWidth(imageSize);
 
 				BufferedImage image = depictor.depictMolecule(molToPredict, signSign.getAtomValues(), null);
 				//			 BufferedImage image = depictor.depict(molToPredict, signSign.getAtomValues())
