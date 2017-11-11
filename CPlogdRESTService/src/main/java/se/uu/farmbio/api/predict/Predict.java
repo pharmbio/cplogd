@@ -143,15 +143,19 @@ public class Predict {
 		}
 	}
 
-	public static Response doImagePredict(String smiles, int imageSize) {
-		logger.debug("got a predict-image task, smiles="+smiles +", imageSize="+imageSize);
+	public static Response doImagePredict(String smiles, int imageWidth, int imageHeight) {
+		logger.debug("got a predict-image task, smiles="+smiles +", imageWidth="+imageWidth+", imageHeight="+imageHeight);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
 		
-		if (imageSize < 400 || imageSize> 2400)
-			return ResponseFactory.badRequestResponse(400, "imageSize must be in the range [400,2400] pixels", "imageSize");
-			
+		if ((imageWidth < 400 || imageWidth> 2400) && (imageHeight < 400 || imageHeight> 2400))
+			return ResponseFactory.badRequestResponse(400, "image size must be in the range [400,2400] pixels in both width and height", Arrays.asList("imageWidth", "imageHeight"));
+		else if (imageWidth < 400 || imageWidth> 2400)
+			return ResponseFactory.badRequestResponse(400, "imageWidth must be in the range [400,2400] pixels", "imageWidth");
+		else if (imageHeight < 400 || imageHeight> 2400)
+			return ResponseFactory.badRequestResponse(400, "imageHeight must be in the range [400,2400] pixels", "imageHeight");
+		
 		IAtomContainer molToPredict=null;
 		CDKMutexLock.requireLock();
 		try {
@@ -171,8 +175,8 @@ public class Predict {
 				MolImageDepictor depictor = new MolGradientDepictor(GradientFactory.getDefaultBloomGradient());
 				//			 MoleculeDepictor depictor = MoleculeDepictor.getBloomDepictor();
 				depictor.setUseLegend(true);
-				depictor.setImageHeight(imageSize);
-				depictor.setImageWidth(imageSize);
+				depictor.setImageHeight(imageHeight);
+				depictor.setImageWidth(imageWidth);
 
 				BufferedImage image = depictor.depictMolecule(molToPredict, signSign.getAtomValues(), null);
 				//			 BufferedImage image = depictor.depict(molToPredict, signSign.getAtomValues())
