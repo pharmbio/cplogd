@@ -6,20 +6,15 @@ import java.net.URI;
 import java.util.Iterator;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.genettasoft.modeling.acp.ACPRegressionResult;
-import com.genettasoft.modeling.app.PredictionResultOutputter;
-import com.genettasoft.modeling.cheminf.SignaturesACPRegression;
-import com.genettasoft.modeling.io.chemreader.IteratingSMILESWithPropertiesReader;
-import com.genettasoft.modeling.io.chemreader.JSONChemFileReader;
+import com.genettasoft.modeling.cheminf.SignaturesCPRegression;
 import com.genettasoft.modeling.io.chemreader.MolReaderFactory;
 
 public class PredictRunnable implements Runnable {
 
-	private static SignaturesACPRegression model;
+	private static SignaturesCPRegression model;
 	private static final Logger logger = LoggerFactory.getLogger(PredictRunnable.class);
 
 	private URI remoteURISource;
@@ -81,40 +76,41 @@ public class PredictRunnable implements Runnable {
 			}
 
 			// create the output
-			PredictionResultOutputter outputter = null;
-			try {
-				if (mols instanceof IteratingSMILESWithPropertiesReader) {
-					outputter = PredictionResultOutputter.getSMILESOutputter(resultsFile, false, ((IteratingSMILESWithPropertiesReader) mols).getColumnHeaders(), null);
-				} else if (mols instanceof IteratingSDFReader){
-					outputter = PredictionResultOutputter.getSDFOutputter(resultsFile, false, null);
-				} else if (mols instanceof JSONChemFileReader){
-					outputter = PredictionResultOutputter.getJSONOutputter(resultsFile, false, null);
-				}
-			} catch(IOException e) {
-				logger.debug("Could not initiate the PredictionResultOutputter", e);
-				exitWithFailure("Server Error - could not initiate the result file outputter");
-			}
+//			PredictionResultOutputter outputter = null;
+//			try {
+//				if (mols instanceof IteratingSMILESWithPropertiesReader) {
+//					outputter = PredictionResultOutputter.getSMILESOutputter(resultsFile, false, ((IteratingSMILESWithPropertiesReader) mols).getColumnHeaders(), null);
+//				} else if (mols instanceof IteratingSDFReader){
+//					outputter = PredictionResultOutputter.getSDFOutputter(resultsFile, false, null);
+//				} else if (mols instanceof JSONChemFileReader){
+//					outputter = PredictionResultOutputter.getJSONOutputter(resultsFile, false, null);
+//				}
+//			} catch(IOException e) {
+//				logger.debug("Could not initiate the PredictionResultOutputter", e);
+//				exitWithFailure("Server Error - could not initiate the result file outputter");
+//			}
 
 
 			IAtomContainer mol;
 			int numSuccess=0, numFailed=0;
-
-			while (mols.hasNext()){
-				mol = mols.next();
-
-				try{
-					ACPRegressionResult res = model.predict(mol, confidence);
-					mol.setProperty("lower", res.getInterval().getValue(0));
-					mol.setProperty("higher", res.getInterval().getValue(1));
-					mol.setProperty("predictionMidpoint", res.getY_hat());
-					mol.setProperty("confidence", confidence);
-					outputter.writeMol(mol, null, null, null);
-					numSuccess++;
-				} catch (Exception e) {
-					numFailed++;
-				}
-
-			}
+			
+//			TODO
+//			while (mols.hasNext()){
+//				mol = mols.next();
+//
+//				try{
+//					CPRegressionResult res = model.predict(mol, confidence);
+//					mol.setProperty("lower", res.getInterval().getValue(0));
+//					mol.setProperty("higher", res.getInterval().getValue(1));
+//					mol.setProperty("predictionMidpoint", res.getY_hat());
+//					mol.setProperty("confidence", confidence);
+//					outputter.writeMol(mol, null, null, null);
+//					numSuccess++;
+//				} catch (Exception e) {
+//					numFailed++;
+//				}
+//
+//			}
 			if (numSuccess == 0) {
 				if (numFailed >0)
 					exitWithFailure("Could not successfully predict any compounds, failed with " + numFailed + " compounds");

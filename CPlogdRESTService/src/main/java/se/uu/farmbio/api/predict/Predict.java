@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;
@@ -23,12 +24,12 @@ import org.slf4j.LoggerFactory;
 
 import com.genettasoft.depict.GradientFactory;
 import com.genettasoft.modeling.CPSignFactory;
-import com.genettasoft.modeling.SignificantSignature;
-import com.genettasoft.modeling.acp.ACPRegressionResult;
-import com.genettasoft.modeling.cheminf.SignaturesACPRegression;
+import com.genettasoft.modeling.cheminf.SignaturesCPRegression;
+import com.genettasoft.modeling.cheminf.SignificantSignature;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
 import com.genettasoft.modeling.io.chemwriter.MolGradientDepictor;
 import com.genettasoft.modeling.io.chemwriter.MolImageDepictor;
+import com.genettasoft.modeling.ml.cp.CPRegressionResult;
 
 import se.uu.farmbio.api.responses.ResponseFactory;
 import se.uu.farmbio.models.Prediction;
@@ -36,13 +37,13 @@ import se.uu.farmbio.models.Prediction;
 public class Predict {
 
 	private static final Logger logger = LoggerFactory.getLogger(Predict.class);
-	private static final String MODEL_SPLIT_1 = "Chembl23_next_to_final_model.1.cpsign";
-	private static final String MODEL_SPLIT_2 = "Chembl23_next_to_final_model.2.cpsign";
+	private static final String MODEL_SPLIT_1 = "Chembl23_1.cpsign";
+	private static final String MODEL_SPLIT_2 = "Chembl23_2.cpsign";
 
 	private static Response serverErrorResponse = null;
-	private static SignaturesACPRegression signaturesACPReg = null;
+	private static SignaturesCPRegression signaturesACPReg = null;
 
-	public static SignaturesACPRegression getModel() {
+	public static SignaturesCPRegression getModel() {
 		return signaturesACPReg;
 	}
 
@@ -79,12 +80,12 @@ public class Predict {
 				URI modelURI_2 = Predict.class.getClassLoader().getResource(MODEL_SPLIT_2).toURI();
 				if(modelURI_1 == null || modelURI_2 == null)
 					throw new IOException("did not locate the model file");
-				signaturesACPReg = (SignaturesACPRegression) BNDLoader.loadModel(modelURI_1, null);
+				signaturesACPReg = (SignaturesCPRegression) BNDLoader.loadModel(modelURI_1, null);
 				logger.info("Loaded first split of model");
 				signaturesACPReg.addModel(modelURI_2, null);
 				logger.info("Loaded second split of model");
 				logger.info("Finished initializing the server with the loaded model");
-			} catch (IllegalAccessException | IOException | URISyntaxException e) {
+			} catch (IllegalAccessException | IOException | URISyntaxException | InvalidKeyException | IllegalArgumentException e) {
 				logger.error("Could not load the model", e);
 				serverErrorResponse = ResponseFactory.errorResponse(500, "Server error - could not load the built model");
 			}
@@ -130,7 +131,7 @@ public class Predict {
 			}
 			// Do prediction
 			try {
-				ACPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
+				CPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
 				logger.debug("Successfully finished predicting smiles="+smiles+", interval=" + res.getInterval() + ", conf=" + confidence);
 				return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence));
 			} catch (IllegalAccessException | CDKException e) {
