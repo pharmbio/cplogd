@@ -149,12 +149,8 @@ public class Predict {
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
 		
-		if ((imageWidth < 400 || imageWidth> 2400) && (imageHeight < 400 || imageHeight> 2400))
-			return ResponseFactory.badRequestResponse(400, "image size must be in the range [400,2400] pixels in both width and height", Arrays.asList("imageWidth", "imageHeight"));
-		else if (imageWidth < 400 || imageWidth> 2400)
-			return ResponseFactory.badRequestResponse(400, "imageWidth must be in the range [400,2400] pixels", "imageWidth");
-		else if (imageHeight < 400 || imageHeight> 2400)
-			return ResponseFactory.badRequestResponse(400, "imageHeight must be in the range [400,2400] pixels", "imageHeight");
+		if (imageWidth > 5000 || imageHeight> 5000)
+			return ResponseFactory.badRequestResponse(400, "image height and width can maximum be 5000 pixels", Arrays.asList("imageWidth", "imageHeight"));
 		
 		IAtomContainer molToPredict=null;
 		CDKMutexLock.requireLock();
