@@ -7,7 +7,7 @@ is an example of building a swagger-enabled JAX-RS server.
 
 This example uses the [JAX-RS](https://jax-rs-spec.java.net/) framework.
 
-To run the server, please execute the following:
+To run the server, execute the following:
 
 ```
 mvn clean package jetty:run
@@ -87,3 +87,11 @@ Running predictions at:
 ```
 localhost/v1/prediction?smiles=CC(%3DO)OCC%5BN%2B%5D(C)(C)C&confidence=0.8
 ```
+
+
+## Add CPSign-jar to maven local repo
+
+https://devcenter.heroku.com/articles/local-maven-dependencies
+
+cd into the lib directory, run command:
+mvn deploy:deploy-file -Durl=file:///Users/staffan/git/cplogd/CPlogdRESTService/repository/ -Dfile=cpsign-0.6.5.jar -DgroupId=com.genettasoft -DartifactId=cpsign -Dpackaging=jar -Dversion=0.6.5
