@@ -1,1 +1,29 @@
-HELLO WORLD!
+<html>
+<head>
+
+<script type="text/javascript" language="javascript" src="jsme/jsme.nocache.js"></script>
+
+<script>
+ //this function will be called after the JavaScriptApplet code has been loaded.
+    function jsmeOnLoad() {
+        jsmeApplet = new JSApplet.JSME("jsme_container", "500px", "500px");
+    }
+</head>
+</script>
+
+<body>
+	<noscript>
+		<div
+			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+			Your web browser must have JavaScript enabled in order for this
+			application to display correctly.</div>
+	</noscript>
+	<h1>JSME demo page</h1>
+
+	<table align="center">
+		<tr>
+			<td id="appletContainer"></td>
+		</tr>
+	</table>
+</body>
+</html>
