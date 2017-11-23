@@ -6,10 +6,17 @@
 <script>
  //this function will be called after the JavaScriptApplet code has been loaded.
     function jsmeOnLoad() {
-        jsmeApplet = new JSApplet.JSME("jsme_container", "500px", "500px");
+        jsmeApplet = new JSApplet.JSME("jsme_container", "100%", "40%");
+        jsmeApplet.setAfterStructureModifiedCallback(showEvent);
     }
-</head>
+
+    function showEvent(event) {
+	    var image = document.getElementById('image');
+		image.src = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=" + event.src.smiles() + "&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + window.innerHeight/2 
+    }
+
 </script>
+</head>
 
 <body>
 	<noscript>
@@ -18,12 +25,8 @@
 			Your web browser must have JavaScript enabled in order for this
 			application to display correctly.</div>
 	</noscript>
-	<h1>JSME demo page</h1>
 
-	<table align="center">
-		<tr>
-			<td id="appletContainer"></td>
-		</tr>
-	</table>
+    <div id="jsme_container"></div>
+    <img id="image" align="middle"></img>
 </body>
 </html>
