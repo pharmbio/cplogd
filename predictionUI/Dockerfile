@@ -1,0 +1,3 @@
+FROM cplogd/openshift-nginx
+
+
