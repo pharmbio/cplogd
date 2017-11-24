@@ -8,6 +8,8 @@
     function jsmeOnLoad() {
         jsmeApplet = new JSApplet.JSME("jsme_container", "100%", "40%");
         jsmeApplet.setAfterStructureModifiedCallback(showEvent);
+   	    var image = document.getElementById('image');
+		image.src = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + window.innerHeight/2 
     }
 
     function showEvent(event) {
@@ -27,6 +29,6 @@
 	</noscript>
 
     <div id="jsme_container"></div>
-    <img id="image" align="middle"></img>
+    <img id="image" style="display: block; margin: auto;"></img>
 </body>
 </html>
