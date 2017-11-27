@@ -12,9 +12,22 @@
 		image.src = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + window.innerHeight/2 
     }
 
+    function imageNotFound() {
+        document.getElementById('error_label').innerText = "ERROR: Something went wrong with rendering the prediction image. Please try with another molecule or contact a site administrator if the problem persists."
+    }
+
+    function imageFound() {
+        document.getElementById('error_label').innerText = ""
+    }
+
     function showEvent(event) {
+        var imageurl = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=" + event.src.smiles() + "&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + Math.floor(window.innerHeight/2)
+        var tester = new Image();
+        tester.addEventListener('error', imageNotFound)
+        tester.addEventListener('load', imageFound)
+        tester.src = imageurl;
 	    var image = document.getElementById('image');
-		image.src = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=" + event.src.smiles() + "&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + window.innerHeight/2 
+		image.src = imageurl;
     }
 
 </script>
@@ -29,6 +42,7 @@
 	</noscript>
 
     <div id="jsme_container"></div>
+    <div id="error_label" style="color:red"></div>
     <img id="image" style="display: block; margin: auto;"></img>
 </body>
 </html>
