@@ -1,5 +1,7 @@
 package se.uu.farmbio.api;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -38,9 +40,9 @@ public class LogdApi  {
 			@io.swagger.annotations.ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
 
 			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
-	public Response logdGet(@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles
-			,@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @QueryParam("confidence") Double confidence
-			,@Context SecurityContext securityContext)
+	public Response logdGet(@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
+			@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @QueryParam("confidence") @Min(0) @Max(1) Double confidence,
+			@Context SecurityContext securityContext)
 					throws NotFoundException {
 		return delegate.logdGet(smiles,confidence,securityContext);
 	}
@@ -61,11 +63,12 @@ public class LogdApi  {
 			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdImgGet(
 			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
-			@ApiParam(value = "Image width", required=false) @DefaultValue("600") @QueryParam("imageWidth") int imgWidth,
-			@ApiParam(value = "Image height (height of molecule part, total image hight will be larger due to added legend)", required=false) @DefaultValue("600") @QueryParam("imageHeight") int imgHeight,
+			@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @QueryParam("confidence") @Min(0) @Max(1) Double confidence,
+			@ApiParam(value = "Image width", required=false) @DefaultValue("600") @QueryParam("imageWidth") @Max(5000) int imgWidth,
+			@ApiParam(value = "Image height (height of molecule part, total image hight will be larger due to added legend)", required=false) @DefaultValue("600") @QueryParam("imageHeight") @Max(5000) int imgHeight,
 			@Context SecurityContext securityContext)
 					throws NotFoundException {
-		return delegate.logdImageGet(smiles, imgWidth, imgHeight, securityContext);
+		return delegate.logdImageGet(smiles, confidence, imgWidth, imgHeight, securityContext);
 	}
 
 

@@ -71,9 +71,9 @@ public class LogdApiServiceImpl extends LogdApiService {
 	}
 
 	@Override
-	public Response logdImageGet(String smiles, int imgWidth, int imgHeight, SecurityContext securityContext) throws NotFoundException {
-		if(smiles==null || smiles.isEmpty())
-			return ResponseFactory.badRequestResponse(400, "missing argument", "smiles");
-		return Predict.doImagePredict(smiles,imgWidth, imgHeight);
+	public Response logdImageGet(String smiles, Double confidence, int imgWidth, int imgHeight, SecurityContext securityContext) throws NotFoundException {
+//		if(smiles==null || smiles.isEmpty())
+//			return ResponseFactory.badRequestResponse(400, "missing argument", "smiles");
+		return Predict.doImagePredict(smiles, confidence, imgWidth, imgHeight);
 	}
 }

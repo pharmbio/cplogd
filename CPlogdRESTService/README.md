@@ -94,4 +94,4 @@ localhost/v1/prediction?smiles=CC(%3DO)OCC%5BN%2B%5D(C)(C)C&confidence=0.8
 https://devcenter.heroku.com/articles/local-maven-dependencies
 
 cd into the lib directory, run command:
-mvn deploy:deploy-file -Durl=file:///Users/staffan/git/cplogd/CPlogdRESTService/repository/ -Dfile=cpsign-0.6.5.jar -DgroupId=com.genettasoft -DartifactId=cpsign -Dpackaging=jar -Dversion=0.6.5
+mvn deploy:deploy-file -Durl=file:///Users/staffan/git/cplogd/CPlogdRESTService/repository/ -Dfile=cpsign-0.6.7.jar -DgroupId=com.genettasoft -DartifactId=cpsign -Dpackaging=jar -Dversion=0.6.7

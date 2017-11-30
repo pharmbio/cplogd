@@ -287,7 +287,7 @@
 		<swagger.url>https://github.com/swagger-api/swagger-ui/archive</swagger.url>
 		<swagger.md5>f06fcf8f95b2ffb22718c6d367f25ace</swagger.md5>
 
-		<cpsign.version>0.6.6</cpsign.version>
+		<cpsign.version>0.6.7</cpsign.version>
 		<java.version>1.7</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>

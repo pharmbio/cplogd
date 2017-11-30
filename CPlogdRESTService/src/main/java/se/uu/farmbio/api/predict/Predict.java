@@ -22,13 +22,16 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.genettasoft.chem.io.out.MoleculeFigure.GradientFigureBuilder;
+import com.genettasoft.chem.io.out.MoleculeGradientDepictor;
+import com.genettasoft.chem.io.out.fields.ColorGradientField;
+import com.genettasoft.chem.io.out.fields.PredictionIntervalField;
+import com.genettasoft.chem.io.out.fields.TitleField;
 import com.genettasoft.depict.GradientFactory;
 import com.genettasoft.modeling.CPSignFactory;
 import com.genettasoft.modeling.cheminf.SignaturesCPRegression;
 import com.genettasoft.modeling.cheminf.SignificantSignature;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
-import com.genettasoft.modeling.io.chemwriter.MolGradientDepictor;
-import com.genettasoft.modeling.io.chemwriter.MolImageDepictor;
 import com.genettasoft.modeling.ml.cp.CPRegressionResult;
 
 import se.uu.farmbio.api.responses.ResponseFactory;
@@ -143,15 +146,39 @@ public class Predict {
 		}
 	}
 
-	public static Response doImagePredict(String smiles, int imageWidth, int imageHeight) {
+	public static Response doImagePredict(String smiles, double conf, int imageWidth, int imageHeight) {
 		logger.debug("got a predict-image task, smiles="+smiles +", imageWidth="+imageWidth+", imageHeight="+imageHeight);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
 		
+		if(conf < 0 || conf > 1){
+			logger.debug("invalid argument confidence=" + conf);
+			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
+		}
+
 		if (imageWidth > 5000 || imageHeight> 5000)
 			return ResponseFactory.badRequestResponse(400, "image height and width can maximum be 5000 pixels", Arrays.asList("imageWidth", "imageHeight"));
 		
+		// Return empty img if no smiles sent
+		if (smiles==null || smiles.isEmpty()){
+			// return an empty img
+			try{
+				BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
+				//			 BufferedImage image = depictor.depict(molToPredict, signSign.getAtomValues())
+
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ImageIO.write(image, "png", baos);
+				byte[] imageData = baos.toByteArray();
+
+				return Response.ok( new ByteArrayInputStream(imageData) ).build();
+			} catch ( IOException e) {
+				logger.debug("Failed returning empty image for empty smiles");
+				return ResponseFactory.errorResponse(500, "Server error");
+			}
+		}
+
+
 		IAtomContainer molToPredict=null;
 		CDKMutexLock.requireLock();
 		try {
@@ -168,13 +195,17 @@ public class Predict {
 
 			try {
 				signSign = signaturesACPReg.predictSignificantSignature(molToPredict);
-				MolImageDepictor depictor = new MolGradientDepictor(GradientFactory.getDefaultBloomGradient());
-				//			 MoleculeDepictor depictor = MoleculeDepictor.getBloomDepictor();
-				depictor.setUseLegend(true);
+				MoleculeGradientDepictor depictor = new MoleculeGradientDepictor(GradientFactory.getDefaultBloomGradient());
 				depictor.setImageHeight(imageHeight);
 				depictor.setImageWidth(imageWidth);
+				GradientFigureBuilder builder = new GradientFigureBuilder(depictor);
+				builder.addFieldOverImg(new TitleField(signaturesACPReg.getModelName()));
+				
+				CPRegressionResult res = signaturesACPReg.predict(molToPredict, conf);
+				builder.addFieldUnderImg(new PredictionIntervalField(res.getInterval(), conf));
+				builder.addFieldUnderImg(new ColorGradientField(depictor.getColorGradient()));
 
-				BufferedImage image = depictor.depictMolecule(molToPredict, signSign.getAtomValues(), null);
+				BufferedImage image = builder.build(molToPredict, signSign.getAtomValues()).getImage();
 				//			 BufferedImage image = depictor.depict(molToPredict, signSign.getAtomValues())
 
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
