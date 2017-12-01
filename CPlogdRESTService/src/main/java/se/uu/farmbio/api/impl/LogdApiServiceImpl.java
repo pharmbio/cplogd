@@ -21,7 +21,10 @@ import se.uu.farmbio.api.responses.ResponseFactory;
 public class LogdApiServiceImpl extends LogdApiService {
 	
 	@Override
-	public Response logdGet( @NotNull String smiles,  @Min(0) @Max(1) Double confidence, SecurityContext securityContext) throws NotFoundException {
+	public Response logdGet( 
+			@NotNull String smiles,  
+			Double confidence, 
+			SecurityContext securityContext) throws NotFoundException {
 		if(smiles==null || smiles.isEmpty())
 			return ResponseFactory.badRequestResponse(400, "missing argument", "smiles");
 		if(confidence == null)
@@ -71,9 +74,7 @@ public class LogdApiServiceImpl extends LogdApiService {
 	}
 
 	@Override
-	public Response logdImageGet(String smiles, Double confidence, int imgWidth, int imgHeight, SecurityContext securityContext) throws NotFoundException {
-//		if(smiles==null || smiles.isEmpty())
-//			return ResponseFactory.badRequestResponse(400, "missing argument", "smiles");
-		return Predict.doImagePredict(smiles, confidence, imgWidth, imgHeight);
+	public Response logdImageGet(String smiles, Double confidence, int imgWidth, int imgHeight, boolean addTitle, SecurityContext securityContext) throws NotFoundException {
+		return Predict.doImagePredict(smiles, confidence, imgWidth, imgHeight, addTitle);
 	}
 }

@@ -1,7 +1,5 @@
 package se.uu.farmbio.api;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -40,8 +38,9 @@ public class LogdApi  {
 			@io.swagger.annotations.ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
 
 			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
-	public Response logdGet(@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
-			@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @QueryParam("confidence") @Min(0) @Max(1) Double confidence,
+	public Response logdGet(
+			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
+			@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8", allowableValues="range(0,1)") @QueryParam("confidence") Double confidence,
 			@Context SecurityContext securityContext)
 					throws NotFoundException {
 		return delegate.logdGet(smiles,confidence,securityContext);
@@ -50,7 +49,7 @@ public class LogdApi  {
 	@Path("/predictionImage")
 	@GET
 	@Consumes({ "multipart/form-data" })
-	@Produces("image/png")
+	@Produces({"image/png", "application/json"})
 	@io.swagger.annotations.ApiOperation(value = "Predict the gradient of a single compound in SMILES format", 
 	notes = "Predict and depict the gradient of a compound in SMILES format, using the logD predictor",
 	response = void.class, 
@@ -62,13 +61,23 @@ public class LogdApi  {
 
 			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdImgGet(
-			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
-			@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8") @QueryParam("confidence") @Min(0) @Max(1) Double confidence,
-			@ApiParam(value = "Image width", required=false) @DefaultValue("600") @QueryParam("imageWidth") @Max(5000) int imgWidth,
-			@ApiParam(value = "Image height (height of molecule part, total image hight will be larger due to added legend)", required=false) @DefaultValue("600") @QueryParam("imageHeight") @Max(5000) int imgHeight,
+			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) 
+			@DefaultValue("c1ccccc1") 
+			@QueryParam("smiles") String smiles,
+			@ApiParam(value = "The desired confidence of the prediction", required=false, allowableValues="range[0,1]") 
+			@QueryParam("confidence") Double confidence,
+			@ApiParam(value = "Image width", required=false, allowableValues="range[200,5000]") 
+			@DefaultValue("600") 
+			@QueryParam("imageWidth") int imgWidth,
+			@ApiParam(value = "Image height (height of molecule part, total image hight will be larger due to added legend & title)", required=false, allowableValues="range[200,5000]") 
+			@DefaultValue("600") 
+			@QueryParam("imageHeight") int imgHeight,
+			@ApiParam(value = "Add title to figure")
+			@DefaultValue("false")
+			@QueryParam("addTitle") boolean addTitle,
 			@Context SecurityContext securityContext)
 					throws NotFoundException {
-		return delegate.logdImageGet(smiles, confidence, imgWidth, imgHeight, securityContext);
+		return delegate.logdImageGet(smiles, confidence, imgWidth, imgHeight, addTitle, securityContext);
 	}
 
 

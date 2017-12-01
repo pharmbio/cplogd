@@ -17,7 +17,6 @@ import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
-import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,7 @@ public class Predict {
 		if(cpsingLogger instanceof ch.qos.logback.classic.Logger) {
 			ch.qos.logback.classic.Logger cpsignRoot = (ch.qos.logback.classic.Logger) cpsingLogger;
 			// Disable all cpsign-output
-			cpsignRoot.setLevel(ch.qos.logback.classic.Level.OFF);
+			cpsignRoot.setLevel(ch.qos.logback.classic.Level.WARN);
 		}
 
 		// Enable debug output for this library
@@ -107,18 +106,18 @@ public class Predict {
 	 */
 
 	public static Response doSinglePredict(String smiles, double confidence) {
-		logger.debug("got a prediction task, smiles="+smiles + " , conf=" + confidence);
+		logger.info("got a prediction task, smiles="+smiles + " , conf=" + confidence);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
 
 		if(confidence < 0 || confidence > 1){
-			logger.debug("invalid argument confidence=" + confidence);
+			logger.warn("invalid argument confidence=" + confidence);
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
 
 		if (smiles==null || smiles.isEmpty()){
-			logger.debug("Missing arguments 'smiles'");
+			logger.warn("Missing arguments 'smiles'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("smiles"));
 		}
 
@@ -128,17 +127,17 @@ public class Predict {
 			// Parse the SMILES
 			try{
 				molToPredict = CPSignFactory.parseSMILES(smiles);
-			} catch(IllegalArgumentException e){
-				logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
+			} catch(Exception | Error e){
+				logger.warn("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
 				return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", Arrays.asList("smiles"));
 			}
 			// Do prediction
 			try {
 				CPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
-				logger.debug("Successfully finished predicting smiles="+smiles+", interval=" + res.getInterval() + ", conf=" + confidence);
+				logger.info("Successfully finished predicting smiles="+smiles+", interval=" + res.getInterval() + ", conf=" + confidence);
 				return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence));
-			} catch (IllegalAccessException | CDKException e) {
-				logger.debug("Failed predicting smiles=" + smiles, e);
+			} catch (Exception | Error e) {
+				logger.warn("Failed predicting smiles=" + smiles, e);
 				return ResponseFactory.errorResponse(500, "Server error predicting");
 			}
 		} finally {
@@ -146,20 +145,27 @@ public class Predict {
 		}
 	}
 
-	public static Response doImagePredict(String smiles, double conf, int imageWidth, int imageHeight) {
-		logger.debug("got a predict-image task, smiles="+smiles +", imageWidth="+imageWidth+", imageHeight="+imageHeight);
+	public static Response doImagePredict(String smiles, Double conf, int imageWidth, int imageHeight, boolean addTitle) {
+		logger.info("got a predict-image task, smiles="+smiles +", conf="+conf+", imageWidth="+imageWidth+", imageHeight="+imageHeight);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
-		
-		if(conf < 0 || conf > 1){
-			logger.debug("invalid argument confidence=" + conf);
+
+		if (conf != null && (conf < 0 || conf > 1)){
+			logger.warn("invalid argument confidence=" + conf);
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
-
-		if (imageWidth > 5000 || imageHeight> 5000)
-			return ResponseFactory.badRequestResponse(400, "image height and width can maximum be 5000 pixels", Arrays.asList("imageWidth", "imageHeight"));
 		
+		if(imageWidth < 200 || imageHeight<200){
+			logger.warn("Failing execution due to too small image required");
+			return ResponseFactory.badRequestResponse(400, "image height and with must be at least 200 pixels", Arrays.asList("imageWidth", "imageHeight"));
+		}
+
+		if (imageWidth > 5000 || imageHeight> 5000){
+			logger.warn("Failing execution due to too large image requested");
+			return ResponseFactory.badRequestResponse(400, "image height and width can maximum be 5000 pixels", Arrays.asList("imageWidth", "imageHeight"));
+		}
+
 		// Return empty img if no smiles sent
 		if (smiles==null || smiles.isEmpty()){
 			// return an empty img
@@ -173,7 +179,7 @@ public class Predict {
 
 				return Response.ok( new ByteArrayInputStream(imageData) ).build();
 			} catch ( IOException e) {
-				logger.debug("Failed returning empty image for empty smiles");
+				logger.info("Failed returning empty image for empty smiles");
 				return ResponseFactory.errorResponse(500, "Server error");
 			}
 		}
@@ -186,7 +192,7 @@ public class Predict {
 			try{
 				molToPredict = CPSignFactory.parseSMILES(smiles);
 			} catch(IllegalArgumentException e){
-				logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
+				logger.warn("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
 				return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", "smiles");
 			}
 
@@ -199,10 +205,14 @@ public class Predict {
 				depictor.setImageHeight(imageHeight);
 				depictor.setImageWidth(imageWidth);
 				GradientFigureBuilder builder = new GradientFigureBuilder(depictor);
-				builder.addFieldOverImg(new TitleField(signaturesACPReg.getModelName()));
-				
-				CPRegressionResult res = signaturesACPReg.predict(molToPredict, conf);
-				builder.addFieldUnderImg(new PredictionIntervalField(res.getInterval(), conf));
+				if (addTitle)
+					builder.addFieldOverImg(new TitleField("Chembl23 CPLogD"));
+
+				// add confidence interval only if given confidence
+				if (conf != null){
+					CPRegressionResult res = signaturesACPReg.predict(molToPredict, conf);
+					builder.addFieldUnderImg(new PredictionIntervalField(res.getInterval(), conf));
+				}
 				builder.addFieldUnderImg(new ColorGradientField(depictor.getColorGradient()));
 
 				BufferedImage image = builder.build(molToPredict, signSign.getAtomValues()).getImage();
@@ -214,8 +224,8 @@ public class Predict {
 
 				return Response.ok( new ByteArrayInputStream(imageData) ).build();
 			}
-			catch (IllegalAccessException | CDKException | IOException e) {
-				logger.debug("Failed predicting smiles=" + smiles, e);
+			catch (Exception | Error e) {
+				logger.warn("Failed predicting smiles=" + smiles, e);
 				return ResponseFactory.errorResponse(500, "Server error");
 			}
 		}
