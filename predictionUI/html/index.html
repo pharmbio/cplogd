@@ -9,7 +9,7 @@
         jsmeApplet = new JSApplet.JSME("jsme_container", "100%", "40%");
         jsmeApplet.setAfterStructureModifiedCallback(showEvent);
    	    var image = document.getElementById('image');
-		image.src = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + window.innerHeight/2 
+		//image.src = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + window.innerHeight/2 
     }
 
     function imageNotFound() {
@@ -21,7 +21,15 @@
     }
 
     function showEvent(event) {
-        var imageurl = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=" + event.src.smiles() + "&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + Math.floor(window.innerHeight/2)
+        redraw()
+    }
+
+    function redraw() {
+        var imageurl = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=" + jsmeApplet.smiles() 
+                     + "&imageWidth="  + Math.floor(window.innerWidth*0.9) 
+                     + "&imageHeight=" + Math.floor(window.innerHeight*0.4)
+                     + "&addTitle=true" 
+                     + "&confidence=" + document.getElementById('confidence').value
         var tester = new Image();
         tester.addEventListener('error', imageNotFound)
         tester.addEventListener('load', imageFound)
@@ -40,8 +48,12 @@
 			Your web browser must have JavaScript enabled in order for this
 			application to display correctly.</div>
 	</noscript>
-
     <div id="jsme_container"></div>
+    Confidence:
+<input id="slider1" type="range" min="0" max="1" step="0.01" value="0.95" 
+       onchange="document.getElementById('confidence').value = document.getElementById('slider1').value; redraw()">
+<input id="confidence" type="text" size="4" value="0.95" disabled>  
+
     <div id="error_label" style="color:red"></div>
     <img id="image" style="display: block; margin: auto;"></img>
 </body>
