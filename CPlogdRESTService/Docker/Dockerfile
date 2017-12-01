@@ -1,4 +1,5 @@
-FROM jetty:9.2-jre7
+FROM jetty:9-jre8
+#FROM jetty:9.2-jre7
 
 LABEL maintainer "staffan.arvidsson@farmbio.uu.se"
 
