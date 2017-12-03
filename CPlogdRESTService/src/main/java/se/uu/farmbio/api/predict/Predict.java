@@ -50,6 +50,9 @@ public class Predict {
 	}
 
 	static {
+		System.setProperty("awt.useSystemAAFontSettings", "lcd");
+		System.setProperty("swing.aatext", "true");
+		System.setProperty("sun.java2d.xrender","true");
 
 		// Get the root logger for cpsign
 		Logger cpsingLogger =  org.slf4j.LoggerFactory.getLogger("com.genettasoft.modeling");
