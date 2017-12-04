@@ -6,7 +6,7 @@
 <script>
  //this function will be called after the JavaScriptApplet code has been loaded.
     function jsmeOnLoad() {
-        jsmeApplet = new JSApplet.JSME("jsme_container", "100%", "40%");
+        jsmeApplet = new JSApplet.JSME("jsme_container", "100%", "45%");
         jsmeApplet.setAfterStructureModifiedCallback(showEvent);
    	    var image = document.getElementById('image');
 		//image.src = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + window.innerHeight/2 
@@ -27,7 +27,7 @@
     function redraw() {
         var imageurl = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=" + jsmeApplet.smiles() 
                      + "&imageWidth="  + Math.floor(window.innerWidth*0.9) 
-                     + "&imageHeight=" + Math.floor(window.innerHeight*0.4)
+                     + "&imageHeight=" + Math.floor(window.innerHeight*0.40-45)
                      + "&addTitle=true" 
                      + "&confidence=" + document.getElementById('confidence').value
         var tester = new Image();
