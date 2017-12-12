@@ -1,13 +1,9 @@
 package se.uu.farmbio.api.predict;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
@@ -16,7 +12,6 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.io.IOUtils;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -238,82 +233,4 @@ public class Predict {
 			CDKMutexLock.releaseLock();
 		}
 	}
-
-
-
-
-	/*
-	 * =====================================================================================================================
-	 * 
-	 * 									MULTIPLE PREDICTIONS (CURRENTLY NOT AVAILIABLE)
-	 * 
-	 * =====================================================================================================================
-	 */
-
-
-	/**
-	 * For URI
-	 * @param predictURI
-	 * @param confidence
-	 * @return
-	 */
-	public static Response doUriPredict(URI predictURI, double confidence) {
-		logger.info("got a prediction task, uri="+ predictURI + " , conf=" + confidence);
-		if (predictURI==null){
-			logger.debug("Missing arguments 'predictURI'");
-			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("uri"));
-		}
-
-		if(serverErrorResponse != null)
-			return serverErrorResponse;
-
-
-		// Spawn a new thread to do the work - send a Task back as 'task accepted'
-		// Get the task ID from backend
-		String taskID = "42"; // TODO
-		new Thread(new PredictRunnable(predictURI, confidence, taskID)).start();
-		logger.debug("Worker thread spawn, sending Task accepted back to caller");
-
-		// Send back the URI needed for query the task
-		return ResponseFactory.taskAccepted("/tasks/" + taskID);
-	}
-
-
-
-	/**
-	 * For dataFile
-	 * @param fileInputStream
-	 * @param confidence
-	 * @return
-	 */
-	public static Response doFilePredict(InputStream fileInputStream, double confidence) {
-		logger.info("got a prediction task with posted file" + " , conf=" + confidence);
-		if (fileInputStream==null){
-			logger.debug("Missing arguments 'fileInputStream'");
-			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("dataFile"));
-		}
-
-		if(serverErrorResponse != null)
-			return serverErrorResponse;
-
-		// We have to copy it to local (for now at least)
-		File tmpPredictFile = null;
-		try{
-			tmpPredictFile = File.createTempFile("molecules.predict", ".tmp");
-			tmpPredictFile.deleteOnExit();
-			IOUtils.copyLarge(fileInputStream, new BufferedOutputStream(new FileOutputStream(tmpPredictFile)));	
-		} catch (Exception e) {
-			logger.debug("Could not copy POST'ed file", e);
-			return ResponseFactory.badRequestResponse(400, "Failed uploading file", "dataFile");
-		}
-
-		// Spawn a new thread to do the work - send a Task back as 'task accepted'
-		// Get the task ID from backend
-		String taskID = "42"; // TODO
-		new Thread(new PredictRunnable(tmpPredictFile, confidence, taskID)).start();
-
-		// Send back the URI needed for query the task
-		return ResponseFactory.taskAccepted("/tasks/" + taskID);
-	}
-
 }
