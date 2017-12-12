@@ -11,6 +11,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
+import javax.annotation.Generated;
 import se.uu.farmbio.api.factories.LogdApiServiceFactory;
 import se.uu.farmbio.models.BadRequestError;
 import se.uu.farmbio.models.Error;
@@ -19,8 +24,8 @@ import se.uu.farmbio.models.Prediction;
 @Path("/")
 @Consumes({ "multipart/form-data" })
 @Produces({ "application/json" })
-@io.swagger.annotations.Api(description = "the logD API")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-05-29T12:46:15.437Z")
+@Api()
+@Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-05-29T12:46:15.437Z")
 public class LogdApi  {
 	private final LogdApiService delegate = LogdApiServiceFactory.getLogdApi();
 
@@ -28,16 +33,16 @@ public class LogdApi  {
 	@GET
 	@Consumes({ "multipart/form-data" })
 	@Produces({ "application/json" })
-	@io.swagger.annotations.ApiOperation(value = "Predict a single compound in SMILES format", 
+	@ApiOperation(value = "Predict a single compound in SMILES format", 
 	notes = "Predict the logD value of a compound in SMILES format", 
 	response = void.class, 
 	tags={ "Predict", })
-	@io.swagger.annotations.ApiResponses(value = { 
-			@io.swagger.annotations.ApiResponse(code = 200, message = "prediction result", response = Prediction.class),
+	@ApiResponses(value = { 
+			@ApiResponse(code = 200, message = "prediction result", response = Prediction.class),
 
-			@io.swagger.annotations.ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
+			@ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
 
-			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
+			@ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdGet(
 			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
 			@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8", allowableValues="range(0,1)") @QueryParam("confidence") Double confidence,
@@ -50,16 +55,16 @@ public class LogdApi  {
 	@GET
 	@Consumes({ "multipart/form-data" })
 	@Produces({"image/png", "application/json"})
-	@io.swagger.annotations.ApiOperation(value = "Predict the gradient of a single compound in SMILES format", 
+	@ApiOperation(value = "Predict the gradient of a single compound in SMILES format", 
 	notes = "Predict and depict the gradient of a compound in SMILES format, using the logD predictor",
 	response = void.class, 
 	tags={ "Predict", })
-	@io.swagger.annotations.ApiResponses(value = { 
-			@io.swagger.annotations.ApiResponse(code = 200, message = "prediction result", response = void.class),
+	@ApiResponses(value = { 
+			@ApiResponse(code = 200, message = "prediction result", response = void.class),
 
-			@io.swagger.annotations.ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
+			@ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
 
-			@io.swagger.annotations.ApiResponse(code = 500, message = "Server error", response = Error.class) })
+			@ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdImgGet(
 			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) 
 			@DefaultValue("c1ccccc1") 
