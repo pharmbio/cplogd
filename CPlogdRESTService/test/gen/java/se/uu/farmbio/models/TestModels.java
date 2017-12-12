@@ -54,18 +54,4 @@ public class TestModels {
 		}
 	}
 	
-	@Test
-	public void TestTaskInfo() {
-		TaskInfo ti = new TaskInfo("/localhost:sdfads", 124.124, 124.0);
-		if(PRINT_JSON)
-			System.out.println(ti);
-		JSONParser parser = new JSONParser();
-		try{
-			JSONObject parsedJSON = (JSONObject) parser.parse(ti.toString());
-			Assert.assertEquals(3, parsedJSON.size());
-		} catch(Exception e){
-			Assert.fail();
-		}
-	}
-
 }

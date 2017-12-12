@@ -31,25 +31,25 @@ import se.uu.farmbio.api.predict.Utils;
 public class Prediction   {
 	@JsonProperty("smiles")
 	@ApiModelProperty(value = "Compound structure notated using SMILES notation", required=true, example="c1ccccc1")
-	private String smiles = null;
+	private final String smiles;
 
 	@JsonProperty("lower")
 	@ApiModelProperty(value = "The lower range of the prediction value", required=true, example="1.755")
-	private Double lower = null;
+	private final Double lower;
 
 	@JsonProperty("upper")
 	@ApiModelProperty(value = "The upper range of the prediction value", required=true, example="2.571")
-	private Double upper = null;
+	private final Double upper;
 
 	@JsonProperty("predictionMidpoint")
 	@ApiModelProperty(
 			value = "The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!", 
 			required=true, example="2.163")
-	private Double predictionMidpoint = null;
+	private final Double predictionMidpoint;
 
 	@JsonProperty("confidence")
 	@ApiModelProperty(value = "The confidence of the prediction", required=true, example="0.8")
-	private Double confidence = null;
+	private final Double confidence;
 
 	public Prediction(String smiles, double lower, double upper, double mp, double confidence) {
 		this.smiles = smiles;
