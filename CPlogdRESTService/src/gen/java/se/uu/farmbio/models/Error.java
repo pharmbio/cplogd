@@ -17,7 +17,6 @@ import java.util.Objects;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
 import org.json.simple.JSONObject;
 
@@ -31,59 +30,20 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel(description = "Error")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-05-29T12:46:15.437Z")
-public class Error   {
+public class Error {
+	
 	@JsonProperty("code")
-	private Integer code = null;
+	@ApiModelProperty(required = true, value = "HTTP status code", example="400")
+	@Min(100)
+	@Max(600)
+	private final Integer code;
 
 	@JsonProperty("message")
-	private String message = null;
+	@ApiModelProperty(required = true, value = "Error message", example="Invalid argument")
+	private final String message;
 	
 	public Error(Integer code, String message) {
 		this.code = code;
-		this.message = message;
-	}
-
-	public Error code(Integer code) {
-		this.code = code;
-		return this;
-	}
-
-	/**
-	 * HTTP status code
-	 * minimum: 100
-	 * maximum: 600
-	 * @return code
-	 **/
-	@JsonProperty("code")
-	@ApiModelProperty(required = true, value = "HTTP status code")
-	@NotNull
-	@Min(100)
-	@Max(600)
-	public Integer getCode() {
-		return code;
-	}
-
-	public void setCode(Integer code) {
-		this.code = code;
-	}
-
-	public Error message(String message) {
-		this.message = message;
-		return this;
-	}
-
-	/**
-	 * Error message
-	 * @return message
-	 **/
-	@JsonProperty("message")
-	@ApiModelProperty(required = true, value = "Error message")
-	@NotNull
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
 		this.message = message;
 	}
 
@@ -106,14 +66,17 @@ public class Error   {
 		return Objects.hash(code, message);
 	}
 
-
 	@SuppressWarnings("unchecked")
-	@Override
-	public String toString() {
+	public JSONObject toJSON(){
 		JSONObject res = new JSONObject();
 		res.put("code", code);
 		res.put("message", message);
-		return res.toJSONString();
+		return res;
+	}
+
+	@Override
+	public String toString() {
+		return toJSON().toJSONString();
 	}
 	
 }

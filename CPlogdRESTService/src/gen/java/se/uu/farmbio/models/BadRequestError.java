@@ -6,6 +6,8 @@ import java.util.Objects;
 
 import org.json.simple.JSONObject;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.annotations.ApiModelProperty;
 
 
@@ -22,6 +24,8 @@ public class BadRequestError extends Error  {
 		this.fields = fields;
 	}
 
+	@JsonProperty("fields")
+	@ApiModelProperty(required = true, value = "Relevant field(s)")
 	private List<String> fields = new ArrayList<String>();
 
 	public BadRequestError fields(List<String> fields) {
@@ -33,20 +37,6 @@ public class BadRequestError extends Error  {
 		this.fields.add(fieldsItem);
 		return this;
 	}
-
-	/**
-	 * Relevant field(s)
-	 * @return fields
-	 **/
-	@ApiModelProperty(required = true, value = "Relevant field(s)")
-	public List<String> getFields() {
-		return fields;
-	}
-
-	public void setFields(List<String> fields) {
-		this.fields = fields;
-	}
-
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -63,15 +53,13 @@ public class BadRequestError extends Error  {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getCode(), getMessage(), fields);
+		return Objects.hash(fields);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public String toString() {
-		JSONObject jsonResponse = new JSONObject();
-		jsonResponse.put("code", getCode());
-		jsonResponse.put("message", getMessage());
+		JSONObject jsonResponse = super.toJSON();
 		jsonResponse.put("fields", fields);
 
 		return jsonResponse.toJSONString();
