@@ -41,6 +41,9 @@ public class Predict {
 	private static final Logger logger = LoggerFactory.getLogger(Predict.class);
 	private static final String MODEL_SPLIT_1 = "Chembl23_1.cpsign";
 	private static final String MODEL_SPLIT_2 = "Chembl23_2.cpsign";
+	
+	private static final int MIN_IMAGE_SIZE = 50;
+	private static final int MAX_IMAGE_SIZE = 5000;
 
 	private static Response serverErrorResponse = null;
 	private static SignaturesCPRegression signaturesACPReg = null;
@@ -159,14 +162,14 @@ public class Predict {
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
 		
-		if(imageWidth < 20 || imageHeight<20){
+		if(imageWidth < MIN_IMAGE_SIZE || imageHeight < MIN_IMAGE_SIZE){
 			logger.warn("Failing execution due to too small image required");
-			return ResponseFactory.badRequestResponse(400, "image height and with must be at least 20 pixels", Arrays.asList("imageWidth", "imageHeight"));
+			return ResponseFactory.badRequestResponse(400, "image height and with must be at least "+MIN_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
 		}
 
-		if (imageWidth > 5000 || imageHeight> 5000){
+		if (imageWidth > MAX_IMAGE_SIZE || imageHeight> MAX_IMAGE_SIZE){
 			logger.warn("Failing execution due to too large image requested");
-			return ResponseFactory.badRequestResponse(400, "image height and width can maximum be 5000 pixels", Arrays.asList("imageWidth", "imageHeight"));
+			return ResponseFactory.badRequestResponse(400, "image height and width can maximum be "+MAX_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
 		}
 
 		// Return empty img if no smiles sent
@@ -211,8 +214,8 @@ public class Predict {
 				if (addTitle)
 					builder.addFieldOverImg(new TitleField("Chembl23 CPLogD"));
 
-				// add confidence interval only if given confidence
-				if (conf != null){
+				// add confidence interval only if given confidence and image size is big enough
+				if (conf != null && imageWidth>80){
 					CPRegressionResult res = signaturesACPReg.predict(molToPredict, conf);
 					builder.addFieldUnderImg(new PredictionIntervalField(res.getInterval(), conf));
 				}

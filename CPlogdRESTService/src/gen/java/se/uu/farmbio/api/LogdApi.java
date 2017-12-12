@@ -71,10 +71,10 @@ public class LogdApi  {
 			@QueryParam("smiles") String smiles,
 			@ApiParam(value = "The desired confidence of the prediction", required=false, allowableValues="range[0,1]") 
 			@QueryParam("confidence") Double confidence,
-			@ApiParam(value = "Image width", required=false, allowableValues="range[200,5000]") 
+			@ApiParam(value = "Image width", required=false, allowableValues="range[50,5000]") 
 			@DefaultValue("600") 
 			@QueryParam("imageWidth") int imgWidth,
-			@ApiParam(value = "Image height (height of molecule part, total image hight will be larger due to added legend & title)", required=false, allowableValues="range[200,5000]") 
+			@ApiParam(value = "Image height (height of molecule part, total image hight will be larger due to added legend & title)", required=false, allowableValues="range[50,5000]") 
 			@DefaultValue("600") 
 			@QueryParam("imageHeight") int imgHeight,
 			@ApiParam(value = "Add title to figure")
