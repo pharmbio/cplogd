@@ -1,6 +1,5 @@
 package se.uu.farmbio.api.impl;
 
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
@@ -13,7 +12,7 @@ public class LogdApiServiceImpl extends LogdApiService {
 	
 	@Override
 	public Response logdGet( 
-			@NotNull String smiles,  
+			String smiles,  
 			Double confidence, 
 			SecurityContext securityContext) throws NotFoundException {
 		if(smiles==null || smiles.isEmpty())

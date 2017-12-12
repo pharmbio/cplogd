@@ -66,15 +66,15 @@ public class LogdApi  {
 
 			@ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdImgGet(
-			@ApiParam(value = "Compound structure notation using SMILES notation") 
-			@DefaultValue("c1ccccc1") 
+			@ApiParam(value = "Compound structure notation using SMILES notation", defaultValue="c1ccccc1") 
 			@QueryParam("smiles") String smiles,
 			@ApiParam(value = "The desired confidence of the prediction", required=false, allowableValues="range[0,1]") 
 			@QueryParam("confidence") Double confidence,
-			@ApiParam(value = "Image width", required=false, allowableValues="range[50,5000]") 
+			@ApiParam(value = "Image width (min 50 pixels, max 5000 pixels)", 
+				required=false, allowableValues="range[50,5000]") 
 			@DefaultValue("600") 
 			@QueryParam("imageWidth") int imgWidth,
-			@ApiParam(value = "Image height (height of molecule part, total image hight will be larger due to added legend & title)", 
+			@ApiParam(value = "Image height (min 50 pixels, max 5000 pixels)", 
 				required=false, allowableValues="range[50,5000]") 
 			@DefaultValue("600") 
 			@QueryParam("imageHeight") int imgHeight,

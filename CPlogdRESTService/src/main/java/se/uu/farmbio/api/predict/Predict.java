@@ -1,5 +1,7 @@
 package se.uu.farmbio.api.predict;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -172,7 +174,10 @@ public class Predict {
 			// return an empty img
 			try{
 				BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-
+				Graphics2D g2d = image.createGraphics();
+				g2d.setColor(Color.WHITE);
+				g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
+				g2d.dispose();
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				ImageIO.write(image, "png", baos);
 				byte[] imageData = baos.toByteArray();
