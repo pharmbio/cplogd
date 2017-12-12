@@ -25,6 +25,15 @@
     }
 
     function redraw() {
+        var smiles = jsmeApplet.smiles()
+        var confidence = document.getElementById('confidence').value
+        window.setTimeout( function() { doRedraw(smiles, confidence) }, 100 );
+    }
+
+    function doRedraw(smiles, confidence) {
+        if ( smiles != jsmeApplet.smiles() || confidence != document.getElementById('confidence').value) {
+            return;
+        }
         var imageurl = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=" + jsmeApplet.smiles() 
                      + "&imageWidth="  + Math.floor(window.innerWidth*0.9) 
                      + "&imageHeight=" + Math.floor(window.innerHeight*0.40-45)
