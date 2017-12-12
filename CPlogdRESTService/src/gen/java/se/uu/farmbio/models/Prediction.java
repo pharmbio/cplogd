@@ -30,18 +30,25 @@ import se.uu.farmbio.api.predict.Utils;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-05-29T12:46:15.437Z")
 public class Prediction   {
 	@JsonProperty("smiles")
+	@ApiModelProperty(value = "Compound structure notated using SMILES notation", required=true, example="c1ccccc1")
 	private String smiles = null;
 
 	@JsonProperty("lower")
+	@ApiModelProperty(value = "The lower range of the prediction value", required=true, example="1.755")
 	private Double lower = null;
 
 	@JsonProperty("upper")
+	@ApiModelProperty(value = "The upper range of the prediction value", required=true, example="2.571")
 	private Double upper = null;
 
 	@JsonProperty("predictionMidpoint")
+	@ApiModelProperty(
+			value = "The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!", 
+			required=true, example="2.163")
 	private Double predictionMidpoint = null;
 
 	@JsonProperty("confidence")
+	@ApiModelProperty(value = "The confidence of the prediction", required=true, example="0.8")
 	private Double confidence = null;
 
 	public Prediction(String smiles, double lower, double upper, double mp, double confidence) {
@@ -51,57 +58,6 @@ public class Prediction   {
 		this.predictionMidpoint = mp;
 		this.confidence = confidence;
 	}
-
-	/**
-	 * Compound structure notated using SMILES notation
-	 * @return smiles
-	 **/
-	@JsonProperty("smiles")
-	@ApiModelProperty(value = "Compound structure notated using SMILES notation")
-	public String getSmiles() {
-		return smiles;
-	}
-
-	/**
-	 * The lower range of the prediction value
-	 * @return lower
-	 **/
-	@JsonProperty("lower")
-	@ApiModelProperty(value = "The lower range of the prediction value")
-	public Double getLower() {
-		return lower;
-	}
-
-	/**
-	 * The upper range of the prediction value
-	 * @return upper
-	 **/
-	@JsonProperty("upper")
-	@ApiModelProperty(value = "The upper range of the prediction value")
-	public Double getUpper() {
-		return upper;
-	}
-
-	/**
-	 * The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!
-	 * @return predictionMidpoint
-	 **/
-	@JsonProperty("predictionMidpoint")
-	@ApiModelProperty(value = "The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!")
-	public Double getPredictionMidpoint() {
-		return predictionMidpoint;
-	}
-
-	/**
-	 * The confidence of the prediction 
-	 * @return confidence
-	 */
-	@JsonProperty("confidence")
-	@ApiModelProperty(value = "The confidence of the prediction")
-	public Double getConfidence() {
-		return confidence;
-	}
-
 
 	@Override
 	public boolean equals(java.lang.Object o) {
