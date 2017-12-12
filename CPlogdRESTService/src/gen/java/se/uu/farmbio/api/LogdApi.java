@@ -68,7 +68,8 @@ public class LogdApi  {
 	public Response logdImgGet(
 			@ApiParam(value = "Compound structure notation using SMILES notation", defaultValue="c1ccccc1") 
 			@QueryParam("smiles") String smiles,
-			@ApiParam(value = "The desired confidence of the prediction", required=false, allowableValues="range[0,1]") 
+			@ApiParam(value = "The desired confidence of the prediction, allowed values=(0, 1)", 
+				required=false, allowableValues="range[0,1]") 
 			@QueryParam("confidence") Double confidence,
 			@ApiParam(value = "Image width (min 50 pixels, max 5000 pixels)", 
 				required=false, allowableValues="range[50,5000]") 
