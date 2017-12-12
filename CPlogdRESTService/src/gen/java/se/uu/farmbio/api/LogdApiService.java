@@ -11,7 +11,7 @@ public abstract class LogdApiService {
 			SecurityContext securityContext) 
 					throws NotFoundException;
 	public abstract Response logdImageGet( 
-			@NotNull String smiles,
+			String smiles,
 			Double confidence, 
 			int imageWidth, 
 			int imageHeight, 

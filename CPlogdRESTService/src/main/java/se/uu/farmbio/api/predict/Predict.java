@@ -162,7 +162,7 @@ public class Predict {
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
 		
-		if(imageWidth < MIN_IMAGE_SIZE || imageHeight < MIN_IMAGE_SIZE){
+		if (imageWidth < MIN_IMAGE_SIZE || imageHeight < MIN_IMAGE_SIZE){
 			logger.warn("Failing execution due to too small image required");
 			return ResponseFactory.badRequestResponse(400, "image height and with must be at least "+MIN_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
 		}
@@ -176,8 +176,7 @@ public class Predict {
 		if (smiles==null || smiles.isEmpty()){
 			// return an empty img
 			try{
-				BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
-				//			 BufferedImage image = depictor.depict(molToPredict, signSign.getAtomValues())
+				BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				ImageIO.write(image, "png", baos);

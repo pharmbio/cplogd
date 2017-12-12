@@ -66,7 +66,7 @@ public class LogdApi  {
 
 			@ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdImgGet(
-			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) 
+			@ApiParam(value = "Compound structure notation using SMILES notation") 
 			@DefaultValue("c1ccccc1") 
 			@QueryParam("smiles") String smiles,
 			@ApiParam(value = "The desired confidence of the prediction", required=false, allowableValues="range[0,1]") 
