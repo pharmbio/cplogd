@@ -159,9 +159,9 @@ public class Predict {
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
 		
-		if(imageWidth < 200 || imageHeight<200){
+		if(imageWidth < 20 || imageHeight<20){
 			logger.warn("Failing execution due to too small image required");
-			return ResponseFactory.badRequestResponse(400, "image height and with must be at least 200 pixels", Arrays.asList("imageWidth", "imageHeight"));
+			return ResponseFactory.badRequestResponse(400, "image height and with must be at least 20 pixels", Arrays.asList("imageWidth", "imageHeight"));
 		}
 
 		if (imageWidth > 5000 || imageHeight> 5000){
