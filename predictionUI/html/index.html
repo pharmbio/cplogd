@@ -1,12 +1,12 @@
 <html>
-<head>
 
+<head>
 <script type="text/javascript" language="javascript" src="jsme/jsme.nocache.js"></script>
 
 <script>
  //this function will be called after the JavaScriptApplet code has been loaded.
     function jsmeOnLoad() {
-        jsmeApplet = new JSApplet.JSME("jsme_container", "100%", "45%");
+        jsmeApplet = new JSApplet.JSME("jsme_container", "100%", "44%");
         jsmeApplet.setAfterStructureModifiedCallback(showEvent);
    	    var image = document.getElementById('image');
 		//image.src = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=&imageWidth="+ Math.floor(window.innerWidth*0.9) +"&imageHeight=" + window.innerHeight/2 
@@ -36,7 +36,7 @@
         }
         var imageurl = "https://cplogd.service.pharmb.io/v1/predictionImage?smiles=" + jsmeApplet.smiles() 
                      + "&imageWidth="  + Math.floor(window.innerWidth*0.9) 
-                     + "&imageHeight=" + Math.floor(window.innerHeight*0.40-45)
+                     + "&imageHeight=" + Math.floor(window.innerHeight*0.40-45-75)
                      + "&addTitle=true" 
                      + "&confidence=" + document.getElementById('confidence').value
         var tester = new Image();
@@ -51,6 +51,17 @@
 </head>
 
 <body>
+<div style="width: 100%; height: 74px; border-bottom: 1px solid #ccc;">
+    <div style="width: 960px; margin: 0 auto;">
+        <div style="width: 400px; float: left;">
+            <h1 style="margin: .24em 0; font-family: Ubuntu, arial, helvetica, sans-serif; letter-spacing: -1px; color: #aaa;"><img src="pharmbio_logo.png" style="position: relative; top: 6px; height: 36px; margin-right: .2em;">pharm<span style="color: #c00"><span>b.io</span></span></h1>
+        </div>
+        <div style="width: 64px; float: right;">
+            <img src="uu_logo.png">
+        </div>
+    </div>
+</div>
+
 	<noscript>
 		<div
 			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
