@@ -31,8 +31,8 @@ public class Bootstrap extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		Info info = new Info()
-				.title("CP Log D")
-				.description("This is a Conformal Prediction Service for predicting Log D values for compounds. The  underlying model has been trained and evaluated on ChEMBL 23 data. Modeling is done using CPSign, product of GenettaSoft AB.")
+				.title("cpLogD")
+				.description("This is a Conformal Prediction Service for predicting logD values for compounds. The  underlying model has been trained and evaluated on ChEMBL 23 data. Modeling is done using CPSign, product of GenettaSoft AB.")
 				.termsOfService("")
 				.version("0.0.1")
 				;

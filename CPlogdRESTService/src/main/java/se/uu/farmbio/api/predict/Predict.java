@@ -211,7 +211,7 @@ public class Predict {
 				depictor.setImageWidth(imageWidth);
 				GradientFigureBuilder builder = new GradientFigureBuilder(depictor);
 				if (addTitle)
-					builder.addFieldOverImg(new TitleField("Chembl23 CPLogD"));
+					builder.addFieldOverImg(new TitleField("Chembl23 cpLogD"));
 
 				// add confidence interval only if given confidence and image size is big enough
 				if (conf != null && imageWidth>80){
