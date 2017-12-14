@@ -397,6 +397,7 @@
                 <http-listener name="default" socket-binding="http" redirect-socket="https"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
+                    <location name="/draw" handler="draw-handler"/>
                     <filter-ref name="server-header"/>
                     <filter-ref name="x-powered-by-header"/>
                 </host>
@@ -407,6 +408,7 @@
             </servlet-container>
             <handlers>
                 <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
+                <file name="draw-handler" path="${jboss.home.dir}/html"/>
             </handlers>
             <filters>
                 <response-header name="server-header" header-name="Server" header-value="WildFly/10"/>

@@ -2,6 +2,8 @@
 
 PID_FILE=/tmp/wildfly.pid
 
+mv /opt/s2i/destination/src/predictionUI/html /wildfly/
+
 # restore maven dependencies downloaded in a previous build,
 # so they do not have to be downloaded again.
 # /opt/s2i/destination/artifacts will only be present in the incremental build scenario
@@ -224,7 +226,10 @@ DEPLOY_DIR=/wildfly/standalone/deployments
 mkdir -p $DEPLOY_DIR
 
 # Copy the source for compilation
-cp -Rf /opt/s2i/destination/src/. $LOCAL_SOURCE_DIR
+cp -Rf /opt/s2i/destination/src/CPlogdRESTService/. $LOCAL_SOURCE_DIR
+mkdir -p $LOCAL_SOURCE_DIR/configuration
+cp -f /opt/s2i/destination/src/predictionUI/standalone.xml $LOCAL_SOURCE_DIR/configuration/
+
 chgrp -R 0 $LOCAL_SOURCE_DIR
 chmod -R g+rw $LOCAL_SOURCE_DIR
 
