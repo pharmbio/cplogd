@@ -23,7 +23,7 @@ objects:
         name: cplogd:latest
     source:
       git:
-        ref: master
+        ref: ORN
         uri: https://github.com/pharmbio/cplogd.git
       type: Git
     strategy:
