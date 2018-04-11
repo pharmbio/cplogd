@@ -12,6 +12,8 @@ objects:
     
 - kind: BuildConfig
   metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: true  
     labels:
       app: cplogd
     name: cplogd
@@ -38,6 +40,8 @@ objects:
 
 - kind: DeploymentConfig
   metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: true  
     labels:
       app: cplogd
     name: cplogd
