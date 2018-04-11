@@ -12,8 +12,6 @@ objects:
     
 - kind: BuildConfig
   metadata:
-    annotations:
-      template.alpha.openshift.io/wait-for-ready: true  
     labels:
       app: cplogd
     name: cplogd
@@ -40,8 +38,6 @@ objects:
 
 - kind: DeploymentConfig
   metadata:
-    annotations:
-      template.alpha.openshift.io/wait-for-ready: true  
     labels:
       app: cplogd
     name: cplogd
@@ -61,16 +57,26 @@ objects:
           - containerPort: '8080'
           protocol: TCP
           resources:
-              limits:
+            limits:
               memory: 3Gi
           volumeMounts:
           - mountPath: /wildfly/modules/com/genettasoft/license/main
             name: volume-cpsign-license
         volumes:
         - name: volume-cpsign-license 
-        secret:
+          secret:
             defaultMode: 420
             secretName: ${CPSIGN_LICENSE}
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - cplogd
+        from:
+          kind: ImageStreamTag
+          name: 'cplogd:latest'
+    - type: ConfigChange
 
 - kind: Service
   metadata:
@@ -83,8 +89,8 @@ objects:
       port: 8080
       protocol: TCP
       targetPort: 8080
-  selector:
-    deploymentconfig: cplogd
+    selector:
+      deploymentconfig: cplogd
 
 - kind: Route
   metadata:
