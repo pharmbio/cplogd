@@ -42,6 +42,7 @@ objects:
       app: cplogd
     name: cplogd
   spec:
+    replicas: 1
     selector:
       app: cplogd
     template:
