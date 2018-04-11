@@ -1,0 +1,5 @@
+1: Create secret like:
+  oc secrets new cpsign-license cpsign0.5-predict.license module.xml
+2: Run like
+  oc process -f logd_service.yaml -p CPSIGN_LICENSE=cpsign-license  | oc create -f -
+ 

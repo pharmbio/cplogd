@@ -1,0 +1,100 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: CPLogD_service
+objects:
+
+- kind: ImageStream
+  metadata:
+    labels:
+      app: cplogd
+    name: cplogd
+    
+- kind: BuildConfig
+  metadata:
+    labels:
+      app: cplogd
+    name: cplogd
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: cplogd:latest
+    source:
+      git:
+        ref: master
+        uri: https://github.com/pharmbio/cplogd.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: wildfly:10.1
+          namespace: openshift
+        type: Source
+    triggers:
+    - type: ConfigChange
+
+- kind: DeploymentConfig
+  metadata:
+    labels:
+      app: cplogd
+    name: cplogd
+  spec:
+    selector:
+      app: cplogd
+    template:
+      metadata:
+        labels:
+          app: cplogd
+      spec:
+        containers:
+        - image: cplogd:latest
+          name: cplogd
+          ports: 
+          - containerPort: '8080'
+          protocol: TCP
+          resources:
+              limits:
+              memory: 3Gi
+          volumeMounts:
+          - mountPath: /wildfly/modules/com/genettasoft/license/main
+            name: volume-cpsign-license
+        volumes:
+        - name: volume-cpsign-license 
+        secret:
+            defaultMode: 420
+            secretName: ${CPSIGN_LICENSE}
+
+- kind: Service
+  metadata:
+    labels:
+      app: cplogd
+    name: cplogd
+  spec:
+    ports: 
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    deploymentconfig: cplogd
+
+- kind: Route
+  metadata:
+    labels:
+      app: cplogd
+    name: cplogd
+  spec:
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: cplogd
+      weight: 100
+
+parameters:
+- name: CPSIGN_LICENSE
+  description: Name of secret containing cpsign license
+  required: true
