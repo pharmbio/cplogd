@@ -30,9 +30,17 @@ public class Bootstrap extends HttpServlet {
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
+		String infoText = "The model predicts Log D based on a support vector machine trained on data from ChEMBL version 23 comprising approximately 1.6 million compounds. "+ 
+				"The confidence interval is calculated for the confidence specified as argument to the endpoints using the conformal prediction approach. "+
+				"For a graphical prediction UI, please go to https://cplogd.service.pharmb.io/draw/. " +
+				"For citing this service and for more information:\n" + 
+				"\n" + 
+				"**A confidence predictor for logD using conformal regression and a support-vector machine**\n" + 
+				"Maris Lapins, Staffan Arvidsson, Samuel Lampa, Arvid Berg, Wesley Schaal, Jonathan Alvarsson and Ola Spjuth Journal of Cheminformatics 10.1 (2018): 17. \n" + 
+				"https://link.springer.com/article/10.1186/s13321-018-0271-1";
 		Info info = new Info()
 				.title("cpLogD")
-				.description("This is a Conformal Prediction Service for predicting logD values for compounds. The  underlying model has been trained and evaluated on ChEMBL 23 data. Modeling is done using CPSign, product of GenettaSoft AB.")
+				.description(infoText)
 				.termsOfService("")
 				.version("0.0.1")
 				;
