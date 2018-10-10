@@ -16,7 +16,7 @@ public class TestPredictionEndpoint {
 	
 	@Test
 	public void testNoSMILES() throws NotFoundException, ParseException{
-		Response res = new LogdApi().logdGet(null, 0.08, null);
+		Response res = new LogdApi().logdGet(null, null, 0.08, null);
 		Assert.assertEquals(400, res.getStatus());
 		assertSMILESisFaulty(res);
 	}
@@ -32,34 +32,34 @@ public class TestPredictionEndpoint {
 	
 	@Test
 	public void testInvalidSMILES() throws NotFoundException, ParseException {
-		Response res = new LogdApi().logdGet("ccc", 0.08, null);
+		Response res = new LogdApi().logdGet("ccc",null, 0.08, null);
 		Assert.assertEquals(400, res.getStatus());
 		assertSMILESisFaulty(res);
 	}
 	
 	@Test
 	public void testConfNumberOutOfRangeNonExisting() throws NotFoundException {
-		Response res = new LogdApi().logdGet("CCCC", null, null);
+		Response res = new LogdApi().logdGet("CCCC",null, null, null);
 		Assert.assertTrue(res.getStatus() != 200);
 		System.out.println("RES no conf: " + res.getEntity());
 	}
 	
 	@Test
 	public void testConfNumberOutOfRangeLow() throws NotFoundException {
-		Response res = new LogdApi().logdGet("CCCC", -0.001, null);
+		Response res = new LogdApi().logdGet("CCCC",null, -0.001, null);
 		System.out.println("RES low conf: " + res.getEntity());
 	}
 	
 	@Test
 	public void testConfNumberOutOfRangeHigh() throws NotFoundException {
-		Response res = new LogdApi().logdGet("CCCC", 1.01, null);
+		Response res = new LogdApi().logdGet("CCCC",null, 1.01, null);
 		System.out.println("RES high conf: " + res.getEntity());
 	}
 	
 	
 	@Test
 	public void testValidSMILEShouldBeOK() throws NotFoundException {
-		Response res = new LogdApi().logdGet("CCCC", 0.08, null);
+		Response res = new LogdApi().logdGet("CCCC",null, 0.08, null);
 		Assert.assertEquals(200, res.getStatus());
 		System.out.println("Correct prediction: " + res.getEntity());
 		

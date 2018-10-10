@@ -33,50 +33,59 @@ public class LogdApi  {
 	@GET
 	@Consumes({ "multipart/form-data" })
 	@Produces({ "application/json" })
-	@ApiOperation(value = "Predict a single compound in SMILES format", 
-	notes = "Predict the logD value of a compound in SMILES format", 
+	@ApiOperation(value = "Make a prediction on a given molecule", 
+	notes = "Predict the logD value of a compound in SMILES or MDL v2000/v3000 format", 
 	response = void.class, 
 	tags={ "Predict", })
 	@ApiResponses(value = { 
-			@ApiResponse(code = 200, message = "prediction result", response = Prediction.class),
+			@ApiResponse(code = 200, message = "Prediction result", response = Prediction.class),
 
-			@ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
+			@ApiResponse(code = 400, message = "Molecule not possible to parse", response = BadRequestError.class),
 
 			@ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdGet(
-			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
+			@ApiParam(value = "(Depricated) Compound structure notation using SMILES notation", required=false)
+			@QueryParam("smiles") String smiles,
+			@ApiParam(value = "Compound structure notation using SMILES or MDL format", required=false)
+			@DefaultValue("c1ccccc1") @QueryParam("molecule") String molecule,
+			//			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
 			@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8", allowableValues="range(0,1)") @QueryParam("confidence") Double confidence,
 			@Context SecurityContext securityContext)
 					throws NotFoundException {
-		return delegate.logdGet(smiles,confidence,securityContext);
+		if (smiles!=null && !smiles.isEmpty()) // TODO - remove in newer versions!
+			return delegate.logdGet(smiles,confidence,securityContext);
+		else 
+			return delegate.logdGet(molecule,confidence,securityContext);
 	}
 
 	@Path("/predictionImage")
 	@GET
 	@Consumes({ "multipart/form-data" })
 	@Produces({"image/png", "application/json"})
-	@ApiOperation(value = "Predict the gradient of a single compound in SMILES format", 
-	notes = "Predict and depict the gradient of a compound in SMILES format, using the logD predictor",
+	@ApiOperation(value = "Depict the gradient of molecule prediction", 
+	notes = "Predict and depict the gradient of a compound in SMILES or MDL v2000/v3000 format, using the logD predictor",
 	response = void.class, 
 	tags={ "Predict", })
 	@ApiResponses(value = { 
-			@ApiResponse(code = 200, message = "prediction result", response = void.class),
+			@ApiResponse(code = 200, message = "Prediction result", response = void.class),
 
-			@ApiResponse(code = 400, message = "SMILES not possible to parse", response = BadRequestError.class),
+			@ApiResponse(code = 400, message = "Molecule not possible to parse", response = BadRequestError.class),
 
 			@ApiResponse(code = 500, message = "Server error", response = Error.class) })
 	public Response logdImgGet(
-			@ApiParam(value = "Compound structure notation using SMILES notation", defaultValue="c1ccccc1") 
+			@ApiParam(value = "(Depricated) Compound structure notation using SMILES notation", required=false)
 			@QueryParam("smiles") String smiles,
+			@ApiParam(value = "Compound structure notation using SMILES or MDL format", required=false)
+			@DefaultValue("c1ccccc1") @QueryParam("molecule") String molecule,
 			@ApiParam(value = "The desired confidence of the prediction, allowed values=(0, 1)", 
-				required=false, allowableValues="range[0,1]") 
+			required=false, allowableValues="range[0,1]") 
 			@QueryParam("confidence") Double confidence,
 			@ApiParam(value = "Image width (min 50 pixels, max 5000 pixels)", 
-				required=false, allowableValues="range[50,5000]") 
+			required=false, allowableValues="range[50,5000]") 
 			@DefaultValue("600") 
 			@QueryParam("imageWidth") int imgWidth,
 			@ApiParam(value = "Image height (min 50 pixels, max 5000 pixels)", 
-				required=false, allowableValues="range[50,5000]") 
+			required=false, allowableValues="range[50,5000]") 
 			@DefaultValue("600") 
 			@QueryParam("imageHeight") int imgHeight,
 			@ApiParam(value = "Add title to figure")
@@ -84,7 +93,10 @@ public class LogdApi  {
 			@QueryParam("addTitle") boolean addTitle,
 			@Context SecurityContext securityContext)
 					throws NotFoundException {
-		return delegate.logdImageGet(smiles, confidence, imgWidth, imgHeight, addTitle, securityContext);
+		if (smiles!=null && !smiles.isEmpty())
+			return delegate.logdImageGet(smiles, confidence, imgWidth, imgHeight, addTitle, securityContext);
+		else
+			return delegate.logdImageGet(molecule, confidence, imgWidth, imgHeight, addTitle, securityContext);
 	}
 
 }
