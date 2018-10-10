@@ -14,6 +14,7 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
+import org.javatuples.Pair;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,6 @@ import com.genettasoft.chem.io.out.fields.ColorGradientField;
 import com.genettasoft.chem.io.out.fields.PredictionIntervalField;
 import com.genettasoft.chem.io.out.fields.TitleField;
 import com.genettasoft.depict.GradientFactory;
-import com.genettasoft.modeling.CPSignFactory;
 import com.genettasoft.modeling.cheminf.SignaturesCPRegression;
 import com.genettasoft.modeling.cheminf.SignificantSignature;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
@@ -38,7 +38,7 @@ public class Predict {
 	private static final Logger logger = LoggerFactory.getLogger(Predict.class);
 	private static final String MODEL_SPLIT_1 = "Chembl23_1.cpsign";
 	private static final String MODEL_SPLIT_2 = "Chembl23_2.cpsign";
-	
+
 	private static final int MIN_IMAGE_SIZE = 50;
 	private static final int MAX_IMAGE_SIZE = 5000;
 
@@ -108,8 +108,8 @@ public class Predict {
 	 * =====================================================================================================================
 	 */
 
-	public static Response doSinglePredict(String smiles, double confidence) {
-		logger.info("got a prediction task, smiles="+smiles + " , conf=" + confidence);
+	public static Response doSinglePredict(String molecule, double confidence) {
+		logger.info("got a prediction task, conf=" + confidence);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
@@ -119,21 +119,29 @@ public class Predict {
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
 
-		if (smiles==null || smiles.isEmpty()){
-			logger.warn("Missing arguments 'smiles'");
-			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("smiles"));
+		if (molecule==null || molecule.isEmpty()){
+			logger.warn("Missing arguments 'molecule'");
+			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("molecule"));
 		}
 
-		IAtomContainer molToPredict=null;
+		// try to parse an IAtomContainer - or fail
+		Pair<IAtomContainer, Response> molOrFail = ChemUtils.parseMolecule(molecule);
+		if (molOrFail.getValue1() != null)
+			return molOrFail.getValue1();
+
+		IAtomContainer molToPredict=molOrFail.getValue0();
+
+		String smiles = null;
+		try {
+			smiles = ChemUtils.getAsSmiles(molToPredict, molecule);
+		} catch (Exception e) {
+			logger.debug("Failed creating smiles from IAtomContainer",e);
+			return ResponseFactory.errorResponse(400, "Could not generate SMILES for molecule");
+		}
+
 		CDKMutexLock.requireLock();
+
 		try{
-			// Parse the SMILES
-			try{
-				molToPredict = CPSignFactory.parseSMILES(smiles);
-			} catch(Exception | Error e){
-				logger.warn("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
-				return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", Arrays.asList("smiles"));
-			}
 			// Do prediction
 			try {
 				CPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
@@ -148,8 +156,8 @@ public class Predict {
 		}
 	}
 
-	public static Response doImagePredict(String smiles, Double conf, int imageWidth, int imageHeight, boolean addTitle) {
-		logger.info("got a predict-image task, smiles="+smiles +", conf="+conf+", imageWidth="+imageWidth+", imageHeight="+imageHeight);
+	public static Response doImagePredict(String molecule, Double conf, int imageWidth, int imageHeight, boolean addTitle) {
+		logger.info("got a predict-image task, conf="+conf+", imageWidth="+imageWidth+", imageHeight="+imageHeight);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
@@ -158,7 +166,7 @@ public class Predict {
 			logger.warn("invalid argument confidence=" + conf);
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
-		
+
 		if (imageWidth < MIN_IMAGE_SIZE || imageHeight < MIN_IMAGE_SIZE){
 			logger.warn("Failing execution due to too small image required");
 			return ResponseFactory.badRequestResponse(400, "image height and with must be at least "+MIN_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
@@ -170,7 +178,7 @@ public class Predict {
 		}
 
 		// Return empty img if no smiles sent
-		if (smiles==null || smiles.isEmpty()){
+		if (molecule==null || molecule.isEmpty()){
 			// return an empty img
 			try{
 				BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
@@ -189,17 +197,25 @@ public class Predict {
 			}
 		}
 
+		// try to parse an IAtomContainer - or fail
+		Pair<IAtomContainer, Response> molOrFail = ChemUtils.parseMolecule(molecule);
+		if (molOrFail.getValue1() != null)
+			return molOrFail.getValue1();
 
-		IAtomContainer molToPredict=null;
+		IAtomContainer molToPredict=molOrFail.getValue0();
+
+		// Get smiles representation of molecule
+		String smiles = null;
+		try {
+			smiles = ChemUtils.getAsSmiles(molToPredict, molecule);
+		} catch (Exception e) {
+			logger.debug("Failed creating smiles from IAtomContainer",e);
+			return ResponseFactory.errorResponse(400, "Could not generate SMILES for molecule");
+		}
+
+
 		CDKMutexLock.requireLock();
 		try {
-			// Parse SMILES
-			try{
-				molToPredict = CPSignFactory.parseSMILES(smiles);
-			} catch(IllegalArgumentException e){
-				logger.warn("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
-				return ResponseFactory.badRequestResponse(400, "Invalid query SMILES '" + smiles + "'", "smiles");
-			}
 
 			// CALCULATE GRADIENT & GENERATE IMAGE
 			SignificantSignature signSign = null;
