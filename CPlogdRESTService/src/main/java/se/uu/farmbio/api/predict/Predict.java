@@ -16,7 +16,6 @@ import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
 import org.javatuples.Pair;
-import org.openscience.cdk.geometry.GeometryUtil;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,8 +127,7 @@ public class Predict {
 
 		// Clean the molecule-string from URL encoding
 		try {
-			if (molecule != null && !molecule.isEmpty())
-				molecule = URLDecoder.decode(molecule, URL_ENCODING);
+			molecule = URLDecoder.decode(molecule, URL_ENCODING);
 		} catch (Exception e) {
 			return ResponseFactory.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
 		}
@@ -209,8 +207,7 @@ public class Predict {
 
 		// Clean the molecule-string
 		try {
-			if (molecule != null && !molecule.isEmpty())
-				molecule = URLDecoder.decode(molecule, URL_ENCODING);
+			molecule = URLDecoder.decode(molecule, URL_ENCODING);
 		} catch (Exception e) {
 			return ResponseFactory.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
 		}
@@ -221,9 +218,6 @@ public class Predict {
 			return molOrFail.getValue1();
 
 		IAtomContainer molToPredict=molOrFail.getValue0();
-
-		if (GeometryUtil.has2DCoordinates(molToPredict))
-			logger.info("Molecule has 2D coordinates pre-calculated");
 
 		// Get smiles representation of molecule
 		String smiles = null;
