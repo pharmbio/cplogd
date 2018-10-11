@@ -34,7 +34,7 @@ public class LogdApi  {
 	@Consumes({ "multipart/form-data" })
 	@Produces({ "application/json" })
 	@ApiOperation(value = "Make a prediction on a given molecule", 
-	notes = "Predict the logD value of a compound in SMILES or MDL v2000/v3000 format", 
+	notes = "Predict the logD value of a compound in SMILES or MDL v2000/v3000 format. In case a MDL is sent, it must be properly URL-encoded in UTF-8. You can use for instance https://www.urlencoder.org/ to encode your file.", 
 	response = void.class, 
 	tags={ "Predict", })
 	@ApiResponses(value = { 
@@ -48,7 +48,6 @@ public class LogdApi  {
 			@QueryParam("smiles") String smiles,
 			@ApiParam(value = "Compound structure notation using SMILES or MDL format", required=false)
 			@DefaultValue("c1ccccc1") @QueryParam("molecule") String molecule,
-			//			@ApiParam(value = "Compound structure notation using SMILES notation", required=true) @DefaultValue("c1ccccc1") @QueryParam("smiles") String smiles,
 			@ApiParam(value = "The desired confidence of the prediction", defaultValue="0.8", allowableValues="range(0,1)") @QueryParam("confidence") Double confidence,
 			@Context SecurityContext securityContext)
 					throws NotFoundException {
@@ -63,7 +62,7 @@ public class LogdApi  {
 	@Consumes({ "multipart/form-data" })
 	@Produces({"image/png", "application/json"})
 	@ApiOperation(value = "Depict the gradient of molecule prediction", 
-	notes = "Predict and depict the gradient of a compound in SMILES or MDL v2000/v3000 format, using the logD predictor",
+	notes = "Predict and depict the gradient of a compound in SMILES or MDL v2000/v3000 format, using the logD predictor. In case a MDL is sent, it must be properly URL-encoded in UTF-8. You can use for instance https://www.urlencoder.org/ to encode your file.",
 	response = void.class, 
 	tags={ "Predict", })
 	@ApiResponses(value = { 

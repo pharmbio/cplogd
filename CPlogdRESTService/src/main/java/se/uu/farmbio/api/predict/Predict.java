@@ -126,15 +126,13 @@ public class Predict {
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("molecule"));
 		}
 
-		// Clean the molecule - Text
+		// Clean the molecule-string from URL encoding
 		try {
 			if (molecule != null && !molecule.isEmpty())
 				molecule = URLDecoder.decode(molecule, URL_ENCODING);
 		} catch (Exception e) {
 			return ResponseFactory.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
 		}
-		if (molecule.split("\n").length > 1)
-			logger.info("MDL file:\n"+molecule);
 
 		// try to parse an IAtomContainer - or fail
 		Pair<IAtomContainer, Response> molOrFail = ChemUtils.parseMolecule(molecule);
@@ -171,7 +169,7 @@ public class Predict {
 	public static Response doImagePredict(String molecule, Double conf, int imageWidth, int imageHeight, boolean addTitle) {
 		logger.info("got a predict-image task, conf="+conf+", imageWidth="+imageWidth+", imageHeight="+imageHeight);
 
-		if(serverErrorResponse != null)
+		if (serverErrorResponse != null)
 			return serverErrorResponse;
 
 		if (conf != null && (conf < 0 || conf > 1)){
@@ -209,16 +207,13 @@ public class Predict {
 			}
 		}
 
-		// Clean the molecule - Text
+		// Clean the molecule-string
 		try {
 			if (molecule != null && !molecule.isEmpty())
 				molecule = URLDecoder.decode(molecule, URL_ENCODING);
 		} catch (Exception e) {
 			return ResponseFactory.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
 		}
-		if (molecule.split("\n").length > 1)
-			logger.info("MDL file:\n"+molecule);
-
 
 		// try to parse an IAtomContainer - or fail
 		Pair<IAtomContainer, Response> molOrFail = ChemUtils.parseMolecule(molecule);
