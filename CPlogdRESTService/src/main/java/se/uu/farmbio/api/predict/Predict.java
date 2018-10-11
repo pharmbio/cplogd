@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.util.Arrays;
 
@@ -42,6 +43,7 @@ public class Predict {
 
 	private static final int MIN_IMAGE_SIZE = 50;
 	private static final int MAX_IMAGE_SIZE = 5000;
+	private static final String URL_ENCODING = "UTF-8";
 
 	private static Response serverErrorResponse = null;
 	private static SignaturesCPRegression signaturesACPReg = null;
@@ -100,7 +102,6 @@ public class Predict {
 	}
 
 
-
 	/*
 	 * =====================================================================================================================
 	 * 
@@ -112,10 +113,10 @@ public class Predict {
 	public static Response doSinglePredict(String molecule, double confidence) {
 		logger.info("got a prediction task, conf=" + confidence);
 
-		if(serverErrorResponse != null)
+		if (serverErrorResponse != null)
 			return serverErrorResponse;
 
-		if(confidence < 0 || confidence > 1){
+		if (confidence < 0 || confidence > 1){
 			logger.warn("invalid argument confidence=" + confidence);
 			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
 		}
@@ -124,6 +125,16 @@ public class Predict {
 			logger.warn("Missing arguments 'molecule'");
 			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("molecule"));
 		}
+
+		// Clean the molecule - Text
+		try {
+			if (molecule != null && !molecule.isEmpty())
+				molecule = URLDecoder.decode(molecule, URL_ENCODING);
+		} catch (Exception e) {
+			return ResponseFactory.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
+		}
+		if (molecule.split("\n").length > 1)
+			logger.info("MDL file:\n"+molecule);
 
 		// try to parse an IAtomContainer - or fail
 		Pair<IAtomContainer, Response> molOrFail = ChemUtils.parseMolecule(molecule);
@@ -159,8 +170,6 @@ public class Predict {
 
 	public static Response doImagePredict(String molecule, Double conf, int imageWidth, int imageHeight, boolean addTitle) {
 		logger.info("got a predict-image task, conf="+conf+", imageWidth="+imageWidth+", imageHeight="+imageHeight);
-		if (molecule.split("\n").length > 1)
-			logger.info("MDL file:\n"+molecule);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
@@ -200,13 +209,24 @@ public class Predict {
 			}
 		}
 
+		// Clean the molecule - Text
+		try {
+			if (molecule != null && !molecule.isEmpty())
+				molecule = URLDecoder.decode(molecule, URL_ENCODING);
+		} catch (Exception e) {
+			return ResponseFactory.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
+		}
+		if (molecule.split("\n").length > 1)
+			logger.info("MDL file:\n"+molecule);
+
+
 		// try to parse an IAtomContainer - or fail
 		Pair<IAtomContainer, Response> molOrFail = ChemUtils.parseMolecule(molecule);
 		if (molOrFail.getValue1() != null)
 			return molOrFail.getValue1();
 
 		IAtomContainer molToPredict=molOrFail.getValue0();
-		
+
 		if (GeometryUtil.has2DCoordinates(molToPredict))
 			logger.info("Molecule has 2D coordinates pre-calculated");
 

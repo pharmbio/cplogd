@@ -1,6 +1,8 @@
 package se.uu.farmbio.models;
 
 import java.io.File;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
@@ -34,6 +36,20 @@ public class TestMDLImageOrientation {
 		GradientFigureBuilder builder = new GradientFigureBuilder(depictor);
 		MoleculeFigure fig = builder.build(molOrResp.getValue0(), new HashMap<Object,Double>());
 		fig.saveToFile(new File("/Users/staffan/Downloads/cplogD.png"));
+	}
+	
+	@Test
+	public void testURLEncode() throws Exception {
+		String original = IOUtils.toString(new File("/Users/staffan/Downloads/new.txt").toURI(), StandardCharsets.UTF_8);
+		System.err.println("ORIGINAL: \n" + original);
+		
+		String encoded = URLEncoder.encode(original, "UTF-8");
+		
+		System.out.println("Encoded:\n" + encoded);
+		
+		String decoded = URLDecoder.decode(encoded, "UTF-8");
+		
+		Assert.assertEquals(original, decoded);
 	}
 
 }
