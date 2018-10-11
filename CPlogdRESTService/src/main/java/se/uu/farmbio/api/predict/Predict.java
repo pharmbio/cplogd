@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
 import org.javatuples.Pair;
+import org.openscience.cdk.geometry.GeometryUtil;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,6 +159,8 @@ public class Predict {
 
 	public static Response doImagePredict(String molecule, Double conf, int imageWidth, int imageHeight, boolean addTitle) {
 		logger.info("got a predict-image task, conf="+conf+", imageWidth="+imageWidth+", imageHeight="+imageHeight);
+		if (molecule.split("\n").length > 1)
+			logger.info("MDL file:\n"+molecule);
 
 		if(serverErrorResponse != null)
 			return serverErrorResponse;
@@ -203,6 +206,9 @@ public class Predict {
 			return molOrFail.getValue1();
 
 		IAtomContainer molToPredict=molOrFail.getValue0();
+		
+		if (GeometryUtil.has2DCoordinates(molToPredict))
+			logger.info("Molecule has 2D coordinates pre-calculated");
 
 		// Get smiles representation of molecule
 		String smiles = null;
