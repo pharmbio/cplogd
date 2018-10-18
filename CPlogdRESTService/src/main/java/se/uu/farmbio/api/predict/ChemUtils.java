@@ -1,7 +1,6 @@
 package se.uu.farmbio.api.predict;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 
 import javax.ws.rs.core.Response;
@@ -39,7 +38,7 @@ public class ChemUtils {
 					logger.debug("molecule data given in MDL v2000 format");
 					try (MDLV2000Reader reader = new MDLV2000Reader(new ByteArrayInputStream(moleculeData.getBytes()));){
 						mol = reader.read(new AtomContainer());
-					} catch (CDKException | IOException e) {
+					} catch (Exception | Error e) {
 						logger.debug("Failed to read molecule as MDL v2000");
 						return new Pair<>(null, Response.status(400).entity( new BadRequestError(400, "Invalid query MDL", Arrays.asList("molecule")).toString() ).build());
 					} 
@@ -47,7 +46,7 @@ public class ChemUtils {
 					logger.debug("molecule data given in MDL v3000 format");
 					try (MDLV3000Reader reader = new MDLV3000Reader(new ByteArrayInputStream(moleculeData.getBytes()));){
 						mol = reader.read(new AtomContainer());
-					} catch (CDKException | IOException e) {
+					} catch (Exception | Error e) {
 						logger.debug("Failed to read molecule as MDL 3000");
 						return new Pair<>(null, Response.status(400).entity( new BadRequestError(400, "Invalid query MDL", Arrays.asList("molecule")).toString() ).build());
 					} 

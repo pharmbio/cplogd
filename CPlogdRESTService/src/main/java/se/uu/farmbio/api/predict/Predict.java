@@ -133,9 +133,16 @@ public class Predict {
 		}
 
 		// try to parse an IAtomContainer - or fail
-		Pair<IAtomContainer, Response> molOrFail = ChemUtils.parseMolecule(molecule);
-		if (molOrFail.getValue1() != null)
-			return molOrFail.getValue1();
+		Pair<IAtomContainer, Response> molOrFail = null;
+		try {
+			molOrFail = ChemUtils.parseMolecule(molecule);
+			if (molOrFail.getValue1() != null)
+				return molOrFail.getValue1();
+		} catch (Exception | Error e) {
+			logger.debug("Unhandled exception in Parsing of molecule input:\n\t"+Utils.getStackTrace(e));
+			return ResponseFactory
+					.badRequestResponse(400, "Faulty molecule input", Arrays.asList("molecule"));
+		}
 
 		IAtomContainer molToPredict=molOrFail.getValue0();
 
@@ -213,9 +220,16 @@ public class Predict {
 		}
 
 		// try to parse an IAtomContainer - or fail
-		Pair<IAtomContainer, Response> molOrFail = ChemUtils.parseMolecule(molecule);
-		if (molOrFail.getValue1() != null)
-			return molOrFail.getValue1();
+		Pair<IAtomContainer, Response> molOrFail = null;
+		try {
+			molOrFail = ChemUtils.parseMolecule(molecule);
+			if (molOrFail.getValue1() != null)
+				return molOrFail.getValue1();
+		} catch (Exception | Error e) {
+			logger.debug("Unhandled exception in Parsing of molecule input:\n\t"+Utils.getStackTrace(e));
+			return ResponseFactory
+					.badRequestResponse(400, "Faulty molecule input", Arrays.asList("molecule"));
+		}
 
 		IAtomContainer molToPredict=molOrFail.getValue0();
 
@@ -268,5 +282,5 @@ public class Predict {
 			CDKMutexLock.releaseLock();
 		}
 	}
-	
+
 }
