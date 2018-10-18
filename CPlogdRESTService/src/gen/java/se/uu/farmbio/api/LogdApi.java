@@ -74,8 +74,11 @@ public class LogdApi  {
 	public Response logdImgGet(
 			@ApiParam(value = "(Depricated) Compound structure notation using SMILES notation", required=false)
 			@QueryParam("smiles") String smiles,
-			@ApiParam(value = "Compound structure notation using SMILES or MDL format", required=false)
-			@DefaultValue("c1ccccc1") @QueryParam("molecule") String molecule,
+			@ApiParam(
+					value = "Compound structure notation using SMILES or MDL format", 
+					required=false,
+					defaultValue="c1ccccc1")
+			@QueryParam("molecule") String molecule,
 			@ApiParam(value = "The desired confidence of the prediction, allowed values=(0, 1). Adds a field with prediction interval for the given confidence, otherwise this is not added.", 
 			required=false, allowableValues="range[0,1]") 
 			@QueryParam("confidence") Double confidence,
