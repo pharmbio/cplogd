@@ -5,6 +5,7 @@ import com.genettasoft.modeling.CPSignFactory;
 public class Utils {
 	
 	private static final String LICENSE_FILE = "cpsign0.5-predict.license";
+	private static final int MAX_NUM_STACK_TO_LOGG = 10;
 	
 	public static CPSignFactory getFactory() throws IllegalArgumentException {
 		try{
@@ -26,6 +27,22 @@ public class Utils {
 		String changeColons = scrambledURI.replaceAll("%3A", ":");
 		String changeDashes = changeColons.replaceAll("%2F", "/");
 		return changeDashes;
+	}
+	
+	public static String getStackTrace(Throwable e) {
+		StringBuilder sb = new StringBuilder();
+		StackTraceElement[] stack = e.getStackTrace();
+		
+		sb.append(e.getClass());
+		sb.append(": ");
+		sb.append(e.getMessage());
+		for (int i=0; i<MAX_NUM_STACK_TO_LOGG && i<stack.length; i++) {
+			sb.append('\n');
+			sb.append('\t');
+			sb.append(stack[i]);
+		}
+		
+		return sb.toString();
 	}
 	
 }

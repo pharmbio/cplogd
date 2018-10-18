@@ -32,7 +32,7 @@ public class ChemUtils {
 		try {
 			CDKMutexLock.requireLock();
 
-			if (moleculeData.split("\n").length > 1) {
+			if (moleculeData.split("\\s",2).length > 1) {
 				// MDL file format
 				IAtomContainer mol = null;
 				if (moleculeData.contains("V2000")) {
@@ -62,7 +62,7 @@ public class ChemUtils {
 				try {
 					return new Pair<>(CPSignFactory.parseSMILES(moleculeData), null);
 				} catch(IllegalArgumentException e){
-					logger.debug("Got exception when parsing smiles: " + e.getMessage() + "\nreturning error-msg and stopping", e);
+					logger.debug("Got exception when parsing smiles:\n" + Utils.getStackTrace(e));
 					return new Pair<> (null,Response.status(400).entity( new BadRequestError(400, "Invalid query SMILES '" + moleculeData + "'", Arrays.asList("molecule")).toString() ).build());
 				} 
 
@@ -74,7 +74,7 @@ public class ChemUtils {
 	}
 	
 	public static synchronized String getAsSmiles(IAtomContainer mol, String originalMol) throws CDKException {
-		if (originalMol.split("\n").length == 1)
+		if (originalMol.split("\\s",2).length > 1)
 			return originalMol;
 		return sg.create(mol);
 	}

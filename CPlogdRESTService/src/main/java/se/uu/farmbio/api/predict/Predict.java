@@ -143,7 +143,7 @@ public class Predict {
 		try {
 			smiles = ChemUtils.getAsSmiles(molToPredict, molecule);
 		} catch (Exception e) {
-			logger.debug("Failed creating smiles from IAtomContainer",e);
+			logger.debug("Failed getting smiles:\n\t"+Utils.getStackTrace(e));
 			return ResponseFactory.errorResponse(400, "Could not generate SMILES for molecule");
 		}
 
@@ -156,7 +156,7 @@ public class Predict {
 				logger.info("Successfully finished predicting smiles="+smiles+", interval=" + res.getInterval() + ", conf=" + confidence);
 				return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence));
 			} catch (Exception | Error e) {
-				logger.warn("Failed predicting smiles=" + smiles, e);
+				logger.warn("Failed predicting smiles=" + smiles +":\n\t" + Utils.getStackTrace(e));
 				return ResponseFactory.errorResponse(500, "Server error predicting");
 			}
 		} finally {
@@ -185,7 +185,7 @@ public class Predict {
 			return ResponseFactory.badRequestResponse(400, "image height and width can maximum be "+MAX_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
 		}
 
-		// Return empty img if no smiles sent
+		// Return empty img if no molecule sent
 		if (molecule==null || molecule.isEmpty()){
 			// return an empty img
 			try{
@@ -200,7 +200,7 @@ public class Predict {
 
 				return Response.ok( new ByteArrayInputStream(imageData) ).build();
 			} catch ( IOException e) {
-				logger.info("Failed returning empty image for empty smiles");
+				logger.info("Failed returning empty image for empty molecule parameter");
 				return ResponseFactory.errorResponse(500, "Server error");
 			}
 		}
@@ -224,10 +224,9 @@ public class Predict {
 		try {
 			smiles = ChemUtils.getAsSmiles(molToPredict, molecule);
 		} catch (Exception e) {
-			logger.debug("Failed creating smiles from IAtomContainer",e);
+			logger.debug("Failed getting smiles:\n\t"+Utils.getStackTrace(e));
 			return ResponseFactory.errorResponse(400, "Could not generate SMILES for molecule");
 		}
-
 
 		CDKMutexLock.requireLock();
 		try {
@@ -261,7 +260,7 @@ public class Predict {
 				return Response.ok( new ByteArrayInputStream(imageData) ).build();
 			}
 			catch (Exception | Error e) {
-				logger.warn("Failed predicting smiles=" + smiles, e);
+				logger.warn("Failed predicting smiles=" + smiles + ", error:\n"+ Utils.getStackTrace(e));
 				return ResponseFactory.errorResponse(500, "Server error");
 			}
 		}
@@ -269,4 +268,5 @@ public class Predict {
 			CDKMutexLock.releaseLock();
 		}
 	}
+	
 }
