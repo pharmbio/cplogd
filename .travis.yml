@@ -1,0 +1,31 @@
+sudo: 'required'
+
+services:
+  - docker
+
+before_script:
+  - wget https://github.com/openshift/source-to-image/releases/download/v1.2.0/source-to-image-v1.2.0-2a579ecd-linux-amd64.tar.gz
+  - tar xvzOf source-to-image-v1.2.0-2a579ecd-linux-amd64.tar.gz > s2i.bin
+  - sudo mv s2i.bin /usr/bin/s2i
+  - sudo chmod 755 /usr/bin/s2i
+
+script:
+  #
+  # Build Docker image (with s2i)
+  #
+
+  # Create a docker image tag out of branch-name where / is replaced by -
+  - tag="${TRAVIS_BRANCH/\//-}"
+  - image="cplogd"
+
+  # Build image from openshift base image
+  - s2i --loglevel 2 build . openshift/wildfly-101-centos7 pharmbio/$image:$tag
+
+  # Test container
+  # - docker run pharmbio/$image:$tag mysql --version
+
+after_success:
+  # Login and push image
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_ACCESS_TOKEN ;
+  - docker push pharmbio/$image:$tag
+
