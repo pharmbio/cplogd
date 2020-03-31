@@ -23,18 +23,17 @@ import se.uu.farmbio.api.predict.ChemUtils;
 
 public class TestMDLImageOrientation {
 	
-	@Test
+//	@Test
 	public void testOrientation() throws Exception {
-		Pair<IAtomContainer, Response> molOrResp = ChemUtils.parseMolecule(IOUtils.toString(new File("/Users/staffan/Downloads/new.txt").toURI(), StandardCharsets.UTF_8));
+		IAtomContainer mol = ChemUtils.parseMolOrFail(IOUtils.toString(new File("/Users/staffan/Downloads/new.txt").toURI(), StandardCharsets.UTF_8));
 		
-		Assert.assertNull(molOrResp.getValue1());
-		Assert.assertNotNull(molOrResp.getValue0());
+		Assert.assertNull(mol);
 		
 		MoleculeGradientDepictor depictor = new MoleculeGradientDepictor(GradientFactory.getDefaultBloomGradient());
 		depictor.setImageHeight(400);
 		depictor.setImageWidth(400);
 		GradientFigureBuilder builder = new GradientFigureBuilder(depictor);
-		MoleculeFigure fig = builder.build(molOrResp.getValue0(), new HashMap<Object,Double>());
+		MoleculeFigure fig = builder.build(mol, new HashMap<Object,Double>());
 		fig.saveToFile(new File("/Users/staffan/Downloads/cplogD.png"));
 	}
 	

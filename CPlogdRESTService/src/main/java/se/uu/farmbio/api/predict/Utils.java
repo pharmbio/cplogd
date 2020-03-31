@@ -1,5 +1,9 @@
 package se.uu.farmbio.api.predict;
 
+import java.net.MalformedURLException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import com.genettasoft.modeling.CPSignFactory;
 
 public class Utils {
@@ -23,12 +27,6 @@ public class Utils {
 		return Math.round(val*1000.0)/1000.0;
 	}
 
-	public static String cleanURI(String scrambledURI){
-		String changeColons = scrambledURI.replaceAll("%3A", ":");
-		String changeDashes = changeColons.replaceAll("%2F", "/");
-		return changeDashes;
-	}
-	
 	public static String getStackTrace(Throwable e) {
 		StringBuilder sb = new StringBuilder();
 		StackTraceElement[] stack = e.getStackTrace();
@@ -43,6 +41,23 @@ public class Utils {
 		}
 		
 		return sb.toString();
+	}
+	
+	public static String decodeURL(String text) throws MalformedURLException {
+		if (text ==null || text.isEmpty())
+			throw new IllegalArgumentException("Empty data");
+
+		// Charges should be kept as charges, so we replace the input "+" with URL-encoding of a "+" instead
+		if (text.contains("+")) {
+			text = text.replace("+", "%2B");
+		}
+
+		// Clean the molecule-string from URL encoding
+		try {
+			return URLDecoder.decode(text, StandardCharsets.UTF_8.name());
+		} catch (Exception e) {
+			throw new MalformedURLException("Could not decode text");
+		}
 	}
 	
 }

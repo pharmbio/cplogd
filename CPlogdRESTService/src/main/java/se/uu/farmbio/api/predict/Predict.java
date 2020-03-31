@@ -6,16 +6,15 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
-import org.javatuples.Pair;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,6 @@ public class Predict {
 
 	private static final int MIN_IMAGE_SIZE = 50;
 	private static final int MAX_IMAGE_SIZE = 5000;
-	private static final String URL_ENCODING = "UTF-8";
 
 	private static Response serverErrorResponse = null;
 	private static SignaturesCPRegression signaturesACPReg = null;
@@ -126,29 +124,26 @@ public class Predict {
 		}
 
 		// Clean the molecule-string from URL encoding
+		String decodedMolData = null;
 		try {
-			molecule = URLDecoder.decode(molecule, URL_ENCODING);
-		} catch (Exception e) {
-			return ResponseFactory.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
-		}
-
-		// try to parse an IAtomContainer - or fail
-		Pair<IAtomContainer, Response> molOrFail = null;
-		try {
-			molOrFail = ChemUtils.parseMolecule(molecule);
-			if (molOrFail.getValue1() != null)
-				return molOrFail.getValue1();
-		} catch (Exception | Error e) {
-			logger.debug("Unhandled exception in Parsing of molecule input:\n\t"+Utils.getStackTrace(e));
+			decodedMolData = Utils.decodeURL(molecule);
+		} catch (MalformedURLException e) {
 			return ResponseFactory
-					.badRequestResponse(400, "Faulty molecule input", Arrays.asList("molecule"));
+					.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
+		} 
+
+		IAtomContainer molToPredict = null;
+		try {
+			molToPredict = ChemUtils.parseMolOrFail(decodedMolData);
+		} catch (IllegalArgumentException e) {
+			return ResponseFactory
+					.badRequestResponse(400, e.getMessage(), Arrays.asList("molecule"));
 		}
 
-		IAtomContainer molToPredict=molOrFail.getValue0();
-
+		// Generate SMILES to have in the response
 		String smiles = null;
 		try {
-			smiles = ChemUtils.getAsSmiles(molToPredict, molecule);
+			smiles = ChemUtils.getAsSmiles(molToPredict, decodedMolData);
 		} catch (Exception e) {
 			logger.debug("Failed getting smiles:\n\t"+Utils.getStackTrace(e));
 			return ResponseFactory.errorResponse(400, "Could not generate SMILES for molecule");
@@ -184,7 +179,7 @@ public class Predict {
 
 		if (imageWidth < MIN_IMAGE_SIZE || imageHeight < MIN_IMAGE_SIZE){
 			logger.warn("Failing execution due to too small image required");
-			return ResponseFactory.badRequestResponse(400, "image height and with must be at least "+MIN_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
+			return ResponseFactory.badRequestResponse(400, "image height and width must be at least "+MIN_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
 		}
 
 		if (imageWidth > MAX_IMAGE_SIZE || imageHeight> MAX_IMAGE_SIZE){
@@ -213,30 +208,27 @@ public class Predict {
 		}
 
 		// Clean the molecule-string
+		// Clean the molecule-string from URL encoding
+		String decodedMolData = null;
 		try {
-			molecule = URLDecoder.decode(molecule, URL_ENCODING);
-		} catch (Exception e) {
-			return ResponseFactory.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
-		}
-
-		// try to parse an IAtomContainer - or fail
-		Pair<IAtomContainer, Response> molOrFail = null;
-		try {
-			molOrFail = ChemUtils.parseMolecule(molecule);
-			if (molOrFail.getValue1() != null)
-				return molOrFail.getValue1();
-		} catch (Exception | Error e) {
-			logger.debug("Unhandled exception in Parsing of molecule input:\n\t"+Utils.getStackTrace(e));
+			decodedMolData = Utils.decodeURL(molecule);
+		} catch (MalformedURLException e) {
 			return ResponseFactory
-					.badRequestResponse(400, "Faulty molecule input", Arrays.asList("molecule"));
+					.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
+		} 
+
+		IAtomContainer molToPredict = null;
+		try {
+			molToPredict = ChemUtils.parseMolOrFail(decodedMolData);
+		} catch (IllegalArgumentException e) {
+			return ResponseFactory
+					.badRequestResponse(400, e.getMessage(), Arrays.asList("molecule"));
 		}
 
-		IAtomContainer molToPredict=molOrFail.getValue0();
-
-		// Get smiles representation of molecule
+		// Generate SMILES to have in the response
 		String smiles = null;
 		try {
-			smiles = ChemUtils.getAsSmiles(molToPredict, molecule);
+			smiles = ChemUtils.getAsSmiles(molToPredict, decodedMolData);
 		} catch (Exception e) {
 			logger.debug("Failed getting smiles:\n\t"+Utils.getStackTrace(e));
 			return ResponseFactory.errorResponse(400, "Could not generate SMILES for molecule");
