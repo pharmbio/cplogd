@@ -1,0 +1,21 @@
+openAPI:
+  openapi: 3.0.1
+  info:
+    version: '0.0.3'
+    title: cpLogD
+    description: 'The model predicts Log D based on a support vector machine trained on data from ChEMBL version 23 comprising approximately 1.6 million compounds. 
+      The confidence interval is calculated for the confidence specified as argument to the endpoints using the conformal prediction approach.
+      For a graphical prediction UI, please go to (https://cplogd.service.pharmb.io/draw/)[https://cplogd.service.pharmb.io/draw/]. 
+      For citing this service and for more information:   
+      **A confidence predictor for logD using conformal regression and a support-vector machine**  
+      Maris Lapins, Staffan Arvidsson, Samuel Lampa, Arvid Berg, Wesley Schaal, Jonathan Alvarsson and Ola Spjuth Journal of Cheminformatics 10.1 (2018): 17.  
+      [link](https://link.springer.com/article/10.1186/s13321-018-0271-1)'
+    contact:
+      name: Aros Bio
+      email: ola@arosbio.com
+      url: https://www.arosbio.com/
+    license:
+      name: "© Aros Bio - All rights reserved"
+    externalDocs:
+      description: Pharmb.io
+      url: https://pharmb.io/
