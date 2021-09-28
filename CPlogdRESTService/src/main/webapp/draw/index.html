@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+    <head>
+        <meta charset="UTF-8">
+
+        <title>Draw UI | cpLogD</title>
+        <link rel="icon" type="image/png" href="favicon_145x145.png" />
+
+        <style>
+            a{
+                color: auto;
+            }
+            a:hover {
+                color: auto;
+            }
+            .text-center *{
+                vertical-align: middle;
+            }
+        </style>
+
+        <script type="text/javascript" language="javascript" src="jsme/jsme.nocache.js"></script>
+        <script type="text/javascript" language="javascript" src="draw_utils.js"></script>
+
+        <script>
+            
+            refresh_ms = 100;
+            base_url = window.location.origin + "/v1/predictionImage?"
+            
+            function jsmeOnLoad() {
+                jsmeApplet = new JSApplet.JSME("jsme_container");
+                jsmeApplet.options('newLook');
+                jsmeApplet.setCallBack("AfterStructureModified", showEvent);
+                
+            }
+
+            function showEvent(event) {
+                redraw()
+            }
+
+            function redraw() {
+                var smiles = encodeURIComponent(jsmeApplet.smiles())
+                var confidence = document.getElementById('confidence').value
+                window.setTimeout( function() { check_redraw(smiles, confidence) }, refresh_ms );
+            }
+
+            function check_redraw(smiles, confidence) {
+                // Check if we should update 
+                if ( smiles != jsmeApplet.smiles() || confidence != document.getElementById('confidence').value ) {
+                    return;
+                }
+
+                // Add the confidence level
+                var image_url = base_url + "confidence=" + confidence
+                console.log("img url html: " + image_url)
+                do_draw(jsmeApplet,document.getElementById('image'),image_url)
+            }
+
+        </script>
+    </head>
+
+    <body style="font-family: sans-serif;">
+        <header style="width: 100%; height: 74px; border-bottom: 1px solid #ccc; margin-bottom:1em;">
+            <div style="width: 100%; margin: 0 auto;">
+                <div style="width: 400px; float: left;">
+                    <h1 style="margin: .24em 0; font-family: Ubuntu, arial, helvetica, sans-serif; letter-spacing: -1px; color: #aaa;">
+                        <!--Pharmb.io logo-->
+                        <a href="https://pharmb.io/" class="header-phmarbio-link" style="text-decoration: none;
+                        color: #aaa; ">
+                            <img src="pharmbio_logo.png" style="position: relative; top: 6px; height: 36px; margin-right: .2em;">pharm<span style="color: #c00"><span>b.io</span></span> 
+                        </a>
+                        
+                        <span style="color: black; margin-left: 2em;color: #444;">cpLogD</span>
+                    </h1>
+                </div>
+                
+                <!-- UU logo-->
+                <div style="width: 64px; float: right;">
+                    <img src="uu_logo.png">
+                </div>
+            </div>
+        </header>
+
+        <!-- Missing JavaScript error-handling -->
+        <noscript>
+            <div
+                style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+                Your web browser must have JavaScript enabled in order for this
+                application to display correctly.</div>
+        </noscript>
+
+        <section class="input" style="margin: auto; height: 45vh;">
+            <div style="width: 40vw; background-color: white; float:right;">
+                <h3 style="margin-top: 0">cpLogD - confidence predictor for logD</h3>
+                <i>Instructions</i>: Draw your molecule in the editor, the prediction underneath will update as you draw. 
+                
+                <p>
+                The model predicts Log D based on a support vector machine trained on data from ChEMBL version 23 comprising approximately 1.6 million compounds. The confidence interval is calculated for the confidence specified by the slider using the conformal prediction approach. For citing this service and for more information:
+                <p>
+                <b>A confidence predictor for logD using conformal regression and a support-vector machine</b><br>
+                Maris Lapins, Staffan Arvidsson, Samuel Lampa, Arvid Berg, Wesley Schaal, Jonathan Alvarsson and Ola Spjuth
+                <i>Journal of Cheminformatics</i> 10.1 (2018): 17.
+                <br>
+                <a href="https://link.springer.com/article/10.1186/s13321-018-0271-1">https://link.springer.com/article/10.1186/s13321-018-0271-1</a> 
+            </div>
+        
+            <!--   -->
+            <!-- <div id="jsme_container" style="width: 57%; float: left;"></div> -->
+            <div class="left-col" style=" width: 57vw; height: 100%; float: left;">
+                <div id="jsme_container" style="height: 95%; width: 100%;"></div> 
+                
+                <div class="text-center" style="padding-top: 2px;">
+                    Confidence:
+                    <input id="confidence" type="range" min="0" max="1" step="0.01" value="0.95" autocomplete="off"
+                    onchange="document.getElementById('conf-out').value = this.value; redraw()">
+                    <output id="conf-out" for="confidence" type="text" size="4">0.95</output> 
+                </div>
+            </div> 
+        </section>
+
+        <!-- <div id="error_label" style="color:red"></div> margin-left: auto; margin-right: auto; -->
+        <section class="output" >
+            <img id="image" style="display: block; text-align: center; margin: 1% auto 1% auto; height: 35vh; max-width: 50vw; color: red; font-weight: bold; font-size: large;" >
+        </section>
+
+        <footer>
+            <div class="container" style="position: fixed; left: 0; right: 0; bottom: 0;">
+                <div class="jsme-contribution" style="float: right; padding-right: .5em;">
+                    Powered by the <a href="https://jsme-editor.github.io/" style="text-decoration: none; color: black;"><b>JSME Molecule Editor</b></a> 
+                </div>
+
+            </div>
+        </footer>
+
+    </body>
+</html>
