@@ -11,42 +11,51 @@
  */
 
 
-package se.uu.farmbio.models;
+package se.uu.farmbio.api.model;
 
 import java.util.Objects;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.ws.rs.core.Response.Status;
 
 import org.json.simple.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 /**
- * Error
+ * ErrorResponse
  */
-@ApiModel(description = "Error")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-05-29T12:46:15.437Z")
-public class Error {
+//@ApiModel(description = "ErrorResponse")
+public class ErrorResponse {
 	
 	@JsonProperty("code")
-	@ApiModelProperty(required = true, value = "HTTP status code", example="400")
+//	@ApiModelProperty(required = true, value = "HTTP status code", example="400")
 	@Min(100)
 	@Max(600)
 	private final Integer code;
 
 	@JsonProperty("message")
-	@ApiModelProperty(required = true, value = "Error message", example="Invalid argument")
+//	@ApiModelProperty(required = true, value = "ErrorResponse message", example="Invalid argument")
 	private final String message;
 	
-	public Error(Integer code, String message) {
+	public ErrorResponse(Status status, String message) {
+		this.code = status.getStatusCode();
+		this.message = message;
+	}
+	
+	public ErrorResponse(Integer code, String message) {
 		this.code = code;
 		this.message = message;
 	}
+	
+	public int getCode() {
+		return code;
+	}
 
+	public String getMessage() {
+		return message;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -56,7 +65,7 @@ public class Error {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		Error error = (Error) o;
+		ErrorResponse error = (ErrorResponse) o;
 		return Objects.equals(this.code, error.code) &&
 				Objects.equals(this.message, error.message);
 	}

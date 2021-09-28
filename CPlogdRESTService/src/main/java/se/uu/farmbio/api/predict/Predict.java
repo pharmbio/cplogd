@@ -1,5 +1,7 @@
 package se.uu.farmbio.api.predict;
 
+import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -14,8 +16,11 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +35,10 @@ import com.genettasoft.modeling.cheminf.SignificantSignature;
 import com.genettasoft.modeling.io.bndTools.BNDLoader;
 import com.genettasoft.modeling.ml.cp.CPRegressionResult;
 
-import se.uu.farmbio.api.responses.ResponseFactory;
-import se.uu.farmbio.models.Prediction;
+import se.uu.farmbio.api.model.BadRequestError;
+import se.uu.farmbio.api.model.ErrorResponse;
+import se.uu.farmbio.api.model.Prediction;
+import se.uu.farmbio.api.model.ServiceRunning;
 
 public class Predict {
 
@@ -39,15 +46,19 @@ public class Predict {
 	private static final String MODEL_SPLIT_1 = "Chembl23_1.cpsign";
 	private static final String MODEL_SPLIT_2 = "Chembl23_2.cpsign";
 
-	private static final int MIN_IMAGE_SIZE = 50;
-	private static final int MAX_IMAGE_SIZE = 5000;
+	public static final int MIN_IMAGE_SIZE = 50;
+	public static final int MAX_IMAGE_SIZE = 5000;
+	public static final int DEFAULT_IMAGE_WH = 600;
 
-	private static Response serverErrorResponse = null;
+	private static ErrorResponse serverErrorResponse = null;
 	private static SignaturesCPRegression signaturesACPReg = null;
+	private static IAtomContainer TEST_MOL;
 
 	public static SignaturesCPRegression getModel() {
 		return signaturesACPReg;
 	}
+	
+	
 
 	static {
 		System.setProperty("awt.useSystemAAFontSettings", "lcd");
@@ -68,14 +79,14 @@ public class Predict {
 			ch.qos.logback.classic.Logger cpLogDLogger = (ch.qos.logback.classic.Logger) cpLogDLogging;
 			cpLogDLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
 		}
-
+		
 		// Instantiate the factory 
-		try{
+		try {
 			Utils.getFactory();
 			logger.info("Initiated the CPSignFactory");
 		} catch (RuntimeException re){
 			logger.error("Got exception when trying to instantiate CPSignFactory: " + re.getMessage());
-			serverErrorResponse = ResponseFactory.errorResponse(500, re.getMessage());
+			serverErrorResponse = new ErrorResponse(500, re.getMessage());
 		}
 		// load the model - only if no error previously encountered
 		if (serverErrorResponse == null) {
@@ -92,9 +103,14 @@ public class Predict {
 				logger.info("Finished initializing the server with the loaded model");
 			} catch (IllegalAccessException | IOException | URISyntaxException | InvalidKeyException | IllegalArgumentException e) {
 				logger.error("Could not load the model", e);
-				serverErrorResponse = ResponseFactory.errorResponse(500, "Server error - could not load the built model");
+				serverErrorResponse = new ErrorResponse(500, "Server error - could not load the model");
 			}
 		}
+		
+		// Create a test-molecule for checking health of the service
+		try {
+			TEST_MOL = new SmilesParser(SilentChemObjectBuilder.getInstance()).parseSmiles("CCCC");
+		} catch (Exception e) {TEST_MOL=null;}
 
 	}
 
@@ -106,21 +122,39 @@ public class Predict {
 	 * 
 	 * =====================================================================================================================
 	 */
+	
+	public static Response checkHealth() {
+		if( serverErrorResponse != null) {
+			return getResponse(new ErrorResponse(SERVICE_UNAVAILABLE, serverErrorResponse.getMessage()));
+		} else {
+			try {
+				signaturesACPReg.predict(TEST_MOL, Arrays.asList(0.5));
+				return Response.ok(new ServiceRunning()).build();
+			} catch (Exception e) {
+				return getResponse(new ErrorResponse(SERVICE_UNAVAILABLE, "License has expired" ));
+			}
+				
+		}
+	}
+	
+	public static Response getResponse(ErrorResponse error) {
+		return Response.status(error.getCode()).entity(error).build();
+	}
 
 	public static Response doSinglePredict(String molecule, double confidence) {
 		logger.info("got a prediction task, conf=" + confidence);
 
 		if (serverErrorResponse != null)
-			return serverErrorResponse;
+			return getResponse(serverErrorResponse);
 
 		if (confidence < 0 || confidence > 1){
 			logger.warn("invalid argument confidence=" + confidence);
-			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "invalid argument", Arrays.asList("confidence")));
 		}
 
 		if (molecule==null || molecule.isEmpty()){
 			logger.warn("Missing arguments 'molecule'");
-			return ResponseFactory.badRequestResponse(400, "missing argument", Arrays.asList("molecule"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "missing argument", Arrays.asList("molecule")));
 		}
 
 		// Clean the molecule-string from URL encoding
@@ -128,16 +162,14 @@ public class Predict {
 		try {
 			decodedMolData = Utils.decodeURL(molecule);
 		} catch (MalformedURLException e) {
-			return ResponseFactory
-					.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "Could not decode molecule text", Arrays.asList("molecule")));
 		} 
 
 		IAtomContainer molToPredict = null;
 		try {
 			molToPredict = ChemUtils.parseMolOrFail(decodedMolData);
 		} catch (IllegalArgumentException e) {
-			return ResponseFactory
-					.badRequestResponse(400, e.getMessage(), Arrays.asList("molecule"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, e.getMessage(), Arrays.asList("molecule")));
 		}
 
 		// Generate SMILES to have in the response
@@ -146,7 +178,7 @@ public class Predict {
 			smiles = ChemUtils.getAsSmiles(molToPredict, decodedMolData);
 		} catch (Exception e) {
 			logger.debug("Failed getting smiles:\n\t"+Utils.getStackTrace(e));
-			return ResponseFactory.errorResponse(400, "Could not generate SMILES for molecule");
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "Could not generate SMILES for molecule",Arrays.asList("molecule")));
 		}
 
 		CDKMutexLock.requireLock();
@@ -156,10 +188,10 @@ public class Predict {
 			try {
 				CPRegressionResult res = signaturesACPReg.predict(molToPredict, confidence);
 				logger.info("Successfully finished predicting smiles="+smiles+", interval=" + res.getInterval() + ", conf=" + confidence);
-				return ResponseFactory.predictResponse(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence));
+				return Response.ok(new Prediction(smiles, res.getInterval().getValue0(), res.getInterval().getValue1(), res.getY_hat(), confidence)).build();
 			} catch (Exception | Error e) {
 				logger.warn("Failed predicting smiles=" + smiles +":\n\t" + Utils.getStackTrace(e));
-				return ResponseFactory.errorResponse(500, "Server error predicting");
+				return getResponse(new ErrorResponse(Status.INTERNAL_SERVER_ERROR, "Server error predicting"));
 			}
 		} finally {
 			CDKMutexLock.releaseLock();
@@ -170,21 +202,21 @@ public class Predict {
 		logger.info("got a predict-image task, conf="+conf+", imageWidth="+imageWidth+", imageHeight="+imageHeight);
 
 		if (serverErrorResponse != null)
-			return serverErrorResponse;
+			return getResponse(serverErrorResponse);
 
 		if (conf != null && (conf < 0 || conf > 1)){
 			logger.warn("invalid argument confidence=" + conf);
-			return ResponseFactory.badRequestResponse(400, "invalid argument", Arrays.asList("confidence"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "invalid argument", Arrays.asList("confidence")));
 		}
 
 		if (imageWidth < MIN_IMAGE_SIZE || imageHeight < MIN_IMAGE_SIZE){
 			logger.warn("Failing execution due to too small image required");
-			return ResponseFactory.badRequestResponse(400, "image height and width must be at least "+MIN_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "image height and width must be at least "+MIN_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight")));
 		}
 
 		if (imageWidth > MAX_IMAGE_SIZE || imageHeight> MAX_IMAGE_SIZE){
 			logger.warn("Failing execution due to too large image requested");
-			return ResponseFactory.badRequestResponse(400, "image height and width can maximum be "+MAX_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "image height and width can maximum be "+MAX_IMAGE_SIZE+" pixels", Arrays.asList("imageWidth", "imageHeight")));
 		}
 
 		// Return empty img if no molecule sent
@@ -203,7 +235,7 @@ public class Predict {
 				return Response.ok( new ByteArrayInputStream(imageData) ).build();
 			} catch ( IOException e) {
 				logger.info("Failed returning empty image for empty molecule parameter");
-				return ResponseFactory.errorResponse(500, "Server error");
+				return getResponse(new ErrorResponse(Status.INTERNAL_SERVER_ERROR, "Server error"));
 			}
 		}
 
@@ -213,16 +245,15 @@ public class Predict {
 		try {
 			decodedMolData = Utils.decodeURL(molecule);
 		} catch (MalformedURLException e) {
-			return ResponseFactory
-					.badRequestResponse(400, "Could not decode molecule text", Arrays.asList("molecule"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "Could not decode molecule text", 
+					Arrays.asList("molecule")));
 		} 
 
 		IAtomContainer molToPredict = null;
 		try {
 			molToPredict = ChemUtils.parseMolOrFail(decodedMolData);
 		} catch (IllegalArgumentException e) {
-			return ResponseFactory
-					.badRequestResponse(400, e.getMessage(), Arrays.asList("molecule"));
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, e.getMessage(), Arrays.asList("molecule")));
 		}
 
 		// Generate SMILES to have in the response
@@ -231,7 +262,7 @@ public class Predict {
 			smiles = ChemUtils.getAsSmiles(molToPredict, decodedMolData);
 		} catch (Exception e) {
 			logger.debug("Failed getting smiles:\n\t"+Utils.getStackTrace(e));
-			return ResponseFactory.errorResponse(400, "Could not generate SMILES for molecule");
+			return getResponse(new BadRequestError(Status.BAD_REQUEST, "Could not generate SMILES for molecule", Arrays.asList("molecule")));
 		}
 
 		CDKMutexLock.requireLock();
@@ -267,7 +298,7 @@ public class Predict {
 			}
 			catch (Exception | Error e) {
 				logger.warn("Failed predicting smiles=" + smiles + ", error:\n"+ Utils.getStackTrace(e));
-				return ResponseFactory.errorResponse(500, "Server error");
+				return getResponse(new ErrorResponse(Status.INTERNAL_SERVER_ERROR, "Server error"));
 			}
 		}
 		finally {

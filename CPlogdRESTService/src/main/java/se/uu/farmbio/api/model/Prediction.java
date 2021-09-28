@@ -11,7 +11,7 @@
  */
 
 
-package se.uu.farmbio.models;
+package se.uu.farmbio.api.model;
 
 import java.util.Objects;
 
@@ -19,36 +19,34 @@ import org.json.simple.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import se.uu.farmbio.api.predict.Utils;
 
 /**
  * Prediction result
  */
-@ApiModel(description = "Prediction result")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-05-29T12:46:15.437Z")
 public class Prediction   {
+	
 	@JsonProperty("smiles")
-	@ApiModelProperty(value = "Compound structure notated using SMILES notation", required=true, example="c1ccccc1")
+	@Schema(description="Compound structure notated using SMILES notation", required=true, example="c1ccccc1")
 	private final String smiles;
 
 	@JsonProperty("lower")
-	@ApiModelProperty(value = "The lower range of the prediction value", required=true, example="1.755")
+	@Schema(description= "The lower range of the prediction value", required=true, example="1.755")
 	private final Double lower;
 
 	@JsonProperty("upper")
-	@ApiModelProperty(value = "The upper range of the prediction value", required=true, example="2.571")
+	@Schema(description= "The upper range of the prediction value", required=true, example="2.571")
 	private final Double upper;
 
 	@JsonProperty("predictionMidpoint")
-	@ApiModelProperty(
-			value = "The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and  there is NO confidence assigned to this point value!", 
+	@Schema(
+			description = "The predicted midpoint value, note that this is the  prediction given by the underlying SVM-models and there is NO confidence assigned to this point value!", 
 			required=true, example="2.163")
 	private final Double predictionMidpoint;
 
 	@JsonProperty("confidence")
-	@ApiModelProperty(value = "The confidence of the prediction", required=true, example="0.8")
+	@Schema(description = "The confidence of the prediction", required=true, example="0.8")
 	private final Double confidence;
 
 	public Prediction(String smiles, double lower, double upper, double mp, double confidence) {

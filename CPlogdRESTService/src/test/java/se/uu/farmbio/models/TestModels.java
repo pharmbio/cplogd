@@ -7,13 +7,17 @@ import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.uu.farmbio.api.model.BadRequestError;
+import se.uu.farmbio.api.model.ErrorResponse;
+import se.uu.farmbio.api.model.Prediction;
+
 public class TestModels {
 	
 	static boolean PRINT_JSON = false;
 	
 	@Test
 	public void TestBadRequestError() {
-		BadRequestError bre = new BadRequestError(500, "Server Error", Arrays.asList("id", "dasa"));
+		BadRequestError bre = new BadRequestError(500, "Server ErrorResponse", Arrays.asList("id", "dasa"));
 		if(PRINT_JSON)
 			System.out.println(bre.toString());
 		
@@ -42,7 +46,7 @@ public class TestModels {
 	
 	@Test
 	public void TestError() {
-		Error err = new Error(241, "error this is eh?");
+		ErrorResponse err = new ErrorResponse(241, "error this is eh?");
 		if(PRINT_JSON)
 			System.out.println(err);
 		JSONParser parser = new JSONParser();

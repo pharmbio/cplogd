@@ -17,7 +17,7 @@ public class Utils {
 			CPSignFactory factory = new CPSignFactory(Utils.class.getClassLoader().getResourceAsStream(LICENSE_FILE));
 			return factory;
 		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("The cpsign-license is not valid, contact info@genettasoft.com to get a new Docker container with a new license");
+			throw new IllegalArgumentException("The cpsign-license is not valid, contact info@arosbio.com to get a new Docker container with a new license");
 		} catch (Exception e) {
 			throw new RuntimeException("Could not instantiate CPSign: " + e.getMessage());
 		}

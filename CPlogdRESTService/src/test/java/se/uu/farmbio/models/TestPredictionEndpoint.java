@@ -9,14 +9,13 @@ import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.uu.farmbio.api.LogdApi;
-import se.uu.farmbio.api.NotFoundException;
+import se.uu.farmbio.api.PredictApi;
 
 public class TestPredictionEndpoint {
 	
 	@Test
-	public void testNoSMILES() throws NotFoundException, ParseException{
-		Response res = new LogdApi().logdGet(null, null, 0.08, null);
+	public void testNoSMILES() throws ParseException{
+		Response res = new PredictApi().predictGet(null, 0.08, null);
 		Assert.assertEquals(400, res.getStatus());
 		assertSMILESisFaulty(res);
 	}
@@ -31,35 +30,35 @@ public class TestPredictionEndpoint {
 	}
 	
 	@Test
-	public void testInvalidSMILES() throws NotFoundException, ParseException {
-		Response res = new LogdApi().logdGet("ccc",null, 0.08, null);
+	public void testInvalidSMILES() throws ParseException {
+		Response res = new PredictApi().predictGet("ccc", 0.08, null);
 		Assert.assertEquals(400, res.getStatus());
 		assertSMILESisFaulty(res);
 	}
 	
 	@Test
-	public void testConfNumberOutOfRangeNonExisting() throws NotFoundException {
-		Response res = new LogdApi().logdGet("CCCC",null, null, null);
+	public void testConfNumberOutOfRangeNonExisting() throws Exception {
+		Response res = new PredictApi().predictGet("CCCC", null, null);
 		Assert.assertTrue(res.getStatus() != 200);
 		System.out.println("RES no conf: " + res.getEntity());
 	}
 	
 	@Test
-	public void testConfNumberOutOfRangeLow() throws NotFoundException {
-		Response res = new LogdApi().logdGet("CCCC",null, -0.001, null);
+	public void testConfNumberOutOfRangeLow() throws Exception {
+		Response res = new PredictApi().predictGet("CCCC", -0.001, null);
 		System.out.println("RES low conf: " + res.getEntity());
 	}
 	
 	@Test
-	public void testConfNumberOutOfRangeHigh() throws NotFoundException {
-		Response res = new LogdApi().logdGet("CCCC",null, 1.01, null);
+	public void testConfNumberOutOfRangeHigh() throws Exception {
+		Response res = new PredictApi().predictGet("CCCC", 1.01, null);
 		System.out.println("RES high conf: " + res.getEntity());
 	}
 	
 	
 	@Test
-	public void testValidSMILEShouldBeOK() throws NotFoundException {
-		Response res = new LogdApi().logdGet("CCCC",null, 0.08, null);
+	public void testValidSMILEShouldBeOK() throws Exception {
+		Response res = new PredictApi().predictGet("CCCC", 0.08, null);
 		Assert.assertEquals(200, res.getStatus());
 		System.out.println("Correct prediction: " + res.getEntity());
 		

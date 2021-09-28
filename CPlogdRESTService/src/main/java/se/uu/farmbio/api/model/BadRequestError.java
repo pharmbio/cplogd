@@ -1,14 +1,14 @@
-package se.uu.farmbio.models;
+package se.uu.farmbio.api.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.json.simple.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
 
 
 
@@ -16,16 +16,19 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * BadRequestError
  */
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2017-03-03T13:55:11.972+01:00")
-public class BadRequestError extends Error  {
-
+public class BadRequestError extends ErrorResponse  {
+	
+	public BadRequestError(Status status, String message, List<String> fields) {
+		super(status, message);
+		this.fields = fields;
+	}
+	
 	public BadRequestError(int code, String message, List<String> fields) {
 		super(code, message);
 		this.fields = fields;
 	}
 
 	@JsonProperty("fields")
-	@ApiModelProperty(required = true, value = "Relevant field(s)")
 	private List<String> fields = new ArrayList<String>();
 
 	public BadRequestError fields(List<String> fields) {
